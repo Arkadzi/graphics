@@ -11,7 +11,7 @@ import java.awt.event.ItemEvent;
 import java.util.function.Function;
 
 public class CylinderPanel implements GraphicPanels {
-    private static final int SIZE = 1000;
+    private static final int SIZE = 600;
     private int fiAngle = 220;
     private int thetaAngle = 60;
     private GraphicCanvas canvas;
@@ -136,7 +136,7 @@ public class CylinderPanel implements GraphicPanels {
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
                                                 new CylinderPoints(radius, height, edges, edges), fiAngle,
-                                                thetaAngle, showNormals);
+                                                thetaAngle, showNormals, false);
     }
 
 }

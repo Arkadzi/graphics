@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BezierPanel implements GraphicPanels {
-    private static final int SIZE = 1200;
+    private static final int SIZE = 600;
     private final GraphicCanvas flatCanvas;
     private JPanel panel;
     private GraphicCanvas canvas;
@@ -182,7 +182,7 @@ public class BezierPanel implements GraphicPanels {
     private Function<Graphics, Drawing> newBezierFunction() {
         return graphics -> new WireframeDrawing(graphics,
                                                 new BezierPoints(sourcePoints, radius, height, edges, edges),
-                                                fiAngle, thetaAngle, showNormals);
+                                                fiAngle, thetaAngle, showNormals, true);
     }
 
     private Function<Graphics, Drawing> newFlatBezierFunction() {

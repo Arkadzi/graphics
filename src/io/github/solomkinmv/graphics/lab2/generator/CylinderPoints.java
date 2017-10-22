@@ -30,23 +30,27 @@ public class CylinderPoints implements PointsGenerator {
         double step = 1. / vParts;
 
         return DoubleStream.iterate(0, (v) -> v <= 1, (v) -> v + step)
-                           .mapToObj(this::generatePointsLayer)
-                           .toArray(Point3D[][]::new);
+                .mapToObj(this::generatePointsLayer)
+                .toArray(Point3D[][]::new);
     }
 
-    private double getRad(double u) {
-        return 2 * Math.PI * u;
-    }
+//    private double getRad(double u) {
+//        return 2 * Math.PI * u;
+//    }
 
     private Point3D[] generatePointsLayer(double v) {
         double step = 1. / hParts;
 
-        return DoubleStream.iterate(0, (u) -> u <= 1, (u) -> u + step)
-                           .mapToObj(u -> getPoint(u, v))
-                           .toArray(Point3D[]::new);
+        return DoubleStream.iterate(-1, y -> y <= 1, y -> y + step)
+                .mapToObj(y -> getPoint(y, v))
+                .toArray(Point3D[]::new);
+//
+//        return DoubleStream.iterate(0, (u) -> u <= 1, (u) -> u + step)
+//                           .mapToObj(u -> getPoint(u, v))
+//                           .toArray(Point3D[]::new);
     }
 
-    private Point3D getPoint(double u, double v) {
-        return new Point3D(r * Math.cos(getRad(u)), r * Math.sin(getRad(u)), h * v);
+    private Point3D getPoint(double y, double v) {
+        return new Point3D(r * y * y, r * y, h * v);
     }
 }
