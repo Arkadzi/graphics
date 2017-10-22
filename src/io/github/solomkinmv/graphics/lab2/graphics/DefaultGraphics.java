@@ -23,6 +23,13 @@ public class DefaultGraphics implements Graphics {
     }
 
     @Override
+    public void line(Point2D point, Color color) {
+        graphics.setColor(color);
+        graphics.drawLine(0, 0, point.getX(), point.getY());
+        graphics.setColor(Color.black);
+    }
+
+    @Override
     public void line(Point2D pointA, Point2D pointB, Color color) {
         graphics.setColor(color);
         line(pointA, pointB);

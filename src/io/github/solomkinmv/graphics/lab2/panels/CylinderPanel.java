@@ -2,23 +2,27 @@ package io.github.solomkinmv.graphics.lab2.panels;
 
 import io.github.solomkinmv.graphics.lab2.figures.Drawing;
 import io.github.solomkinmv.graphics.lab2.figures.WireframeDrawing;
-import io.github.solomkinmv.graphics.lab2.generator.CylinderPoints;
+import io.github.solomkinmv.graphics.lab2.generator.PortionPoints;
 import io.github.solomkinmv.graphics.lab2.graphics.Graphics;
+import io.github.solomkinmv.graphics.lab2.types.Point3D;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.util.Arrays;
 import java.util.function.Function;
 
 public class CylinderPanel implements GraphicPanels {
-    private static final int SIZE = 1000;
+    private static final int SIZE = 500;
     private int fiAngle = 220;
     private int thetaAngle = 60;
     private GraphicCanvas canvas;
     private JPanel panel;
     private int edges = 10;
-    private int radius = 200;
-    private int height = 300;
+    private String line1Str = "0,0,0;0,0.5,1;0,1,0";
+    private String line2Str = "1,0,0;1,0.5,0;1,1,0";
+    private Point3D[] line1 = parseBezierPoints(line1Str);
+    private Point3D[] line2 = parseBezierPoints(line2Str);
     private boolean showNormals;
 
     public CylinderPanel() {
@@ -31,9 +35,9 @@ public class CylinderPanel implements GraphicPanels {
     }
 
     private void init() {
-        panel = new JPanel();
+        panel = new JPanel(new BorderLayout());
         panel.add(canvas);
-        panel.add(createControls());
+        panel.add(createControls(), BorderLayout.SOUTH);
     }
 
     private Component createControls() {
@@ -41,15 +45,15 @@ public class CylinderPanel implements GraphicPanels {
 
         setNavigationButtons(controlPanel);
         setEdgesSlider(controlPanel);
-        setRadiusSpinner(controlPanel);
-        setHeightSpinner(controlPanel);
+        setFi1Text(controlPanel);
+        setFi2Text(controlPanel);
         setNormalsShowCheckBox(controlPanel);
 
         return controlPanel;
     }
 
     private void setNormalsShowCheckBox(JPanel controlPanel) {
-        JCheckBox normalsCheckBox = new JCheckBox("Show normals");
+        JCheckBox normalsCheckBox = new JCheckBox("Показать нормали");
         normalsCheckBox.addItemListener(e -> {
             showNormals = e.getStateChange() == ItemEvent.SELECTED;
             repaint();
@@ -57,32 +61,38 @@ public class CylinderPanel implements GraphicPanels {
         controlPanel.add(normalsCheckBox);
     }
 
-    private void setRadiusSpinner(JPanel controlPanel) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(200, //initial value
-                                                           20, //min
-                                                           300, //max
-                                                           20);//step
-        JSpinner spinner = new JSpinner(spinnerModel);
-        spinner.addChangeListener(e -> {
-            radius = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
-            repaint();
-        });
-        controlPanel.add(new Label("Radius"));
-        controlPanel.add(spinner);
+    private void setFi1Text(JPanel controlPanel) {
+            JTextField bezierText = new JTextField(line1Str);
+            bezierText.addActionListener(e -> {
+                line1Str = bezierText.getText();
+                line1 = parseBezierPoints(line1Str);
+                repaint();
+            });
+
+            controlPanel.add(new Label("Fi 1"));
+            controlPanel.add(bezierText);
     }
 
-    private void setHeightSpinner(JPanel controlPanel) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(200, //initial value
-                                                           20, //min
-                                                           300, //max
-                                                           20);//step
-        JSpinner spinner = new JSpinner(spinnerModel);
-        spinner.addChangeListener(e -> {
-            height = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
-            repaint();
-        });
-        controlPanel.add(new Label("Height"));
-        controlPanel.add(spinner);
+    private void setFi2Text(JPanel controlPanel) {
+            JTextField bezierText = new JTextField(line2Str);
+            bezierText.addActionListener(e -> {
+                line2Str = bezierText.getText();
+                line2 = parseBezierPoints(line2Str);
+                repaint();
+            });
+
+            controlPanel.add(new Label("Fi 2"));
+            controlPanel.add(bezierText);
+    }
+
+    private Point3D[] parseBezierPoints(String line) {
+        Function<String, Point3D> stringToPoint = (str) -> {
+            String[] xyChunks = str.split(",");
+            return new Point3D(Float.parseFloat(xyChunks[0]), Float.parseFloat(xyChunks[1]), Float.parseFloat(xyChunks[2]));
+        };
+        return Arrays.stream(line.split(";"))
+                .map(stringToPoint)
+                .toArray(Point3D[]::new);
     }
 
     private void setEdgesSlider(JPanel controlPanel) {
@@ -93,7 +103,7 @@ public class CylinderPanel implements GraphicPanels {
             edges = ((JSlider) e.getSource()).getValue();
             repaint();
         });
-        controlPanel.add(new Label("edges"));
+        controlPanel.add(new Label("Сетка"));
         controlPanel.add(slider);
     }
 
@@ -103,25 +113,25 @@ public class CylinderPanel implements GraphicPanels {
     }
 
     private void setNavigationButtons(JPanel controlPanel) {
-        JButton leftButton = new JButton("left");
+        JButton leftButton = new JButton("Повернуть влево");
         leftButton.addActionListener(e -> {
             fiAngle += 10;
             repaint();
         });
 
-        JButton rightButton = new JButton("right");
+        JButton rightButton = new JButton("Повернуть вправо");
         rightButton.addActionListener(e -> {
             fiAngle -= 10;
             repaint();
         });
 
-        JButton upButton = new JButton("up");
+        JButton upButton = new JButton("Повернуть вверх");
         upButton.addActionListener(e -> {
             thetaAngle -= 10;
             repaint();
         });
 
-        JButton downButton = new JButton("down");
+        JButton downButton = new JButton("Повернуть вниз");
         downButton.addActionListener(e -> {
             thetaAngle += 10;
             repaint();
@@ -135,8 +145,11 @@ public class CylinderPanel implements GraphicPanels {
 
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
-                                                new CylinderPoints(radius, height, edges, edges), fiAngle,
-                                                thetaAngle, showNormals, true);
+                new PortionPoints(
+                        line1,
+                        line2,
+                        edges, edges), fiAngle,
+                thetaAngle, showNormals, false, true);
     }
 
 }

@@ -16,15 +16,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BezierPanel implements GraphicPanels {
-    private static final int SIZE = 1200;
+    private static final int SIZE = 500;
     private final GraphicCanvas flatCanvas;
     private JPanel panel;
     private GraphicCanvas canvas;
     private int fiAngle = 220;
     private int thetaAngle = 60;
     private int edges = 10;
-    private int radius = 30;
-    private int height = 30;
+    private int scale = 30;
     private boolean showNormals;
     private String bezierPoints = "1,1;5,7;8,2;10,10;15,12";
     private List<Point2D> sourcePoints;
@@ -32,7 +31,7 @@ public class BezierPanel implements GraphicPanels {
     public BezierPanel() {
         parseBezierPoints();
         canvas = new GraphicCanvas(newBezierFunction(), SIZE, SIZE);
-        flatCanvas = new GraphicCanvas(newFlatBezierFunction(), SIZE / 2, SIZE / 2);
+        flatCanvas = new GraphicCanvas(newFlatBezierFunction(), SIZE / 2, SIZE);
         init();
     }
 
@@ -57,8 +56,7 @@ public class BezierPanel implements GraphicPanels {
 
         setNavigationButtons(controlPanel);
         setEdgesSlider(controlPanel);
-        setRadiusSpinner(controlPanel);
-        setHeightSpinner(controlPanel);
+        setSizeSpinner(controlPanel);
         setBezierPointsEditor(controlPanel);
         setNormalsShowCheckBox(controlPanel);
 
@@ -66,7 +64,7 @@ public class BezierPanel implements GraphicPanels {
     }
 
     private void setNormalsShowCheckBox(JPanel controlPanel) {
-        JCheckBox normalsCheckBox = new JCheckBox("Show normals");
+        JCheckBox normalsCheckBox = new JCheckBox("Показать нормали");
         normalsCheckBox.addItemListener(e -> {
             showNormals = e.getStateChange() == ItemEvent.SELECTED;
             repaint();
@@ -82,7 +80,7 @@ public class BezierPanel implements GraphicPanels {
             repaint();
         });
 
-        controlPanel.add(new Label("Bezier points"));
+        controlPanel.add(new Label("Точки"));
         controlPanel.add(bezierText);
     }
 
@@ -104,31 +102,17 @@ public class BezierPanel implements GraphicPanels {
         flatCanvas.repaint();
     }
 
-    private void setRadiusSpinner(JPanel controlPanel) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(radius, //initial value
+    private void setSizeSpinner(JPanel controlPanel) {
+        SpinnerModel spinnerModel = new SpinnerNumberModel(scale, //initial value
                                                            5, //min
                                                            300, //max
                                                            10);//step
         JSpinner spinner = new JSpinner(spinnerModel);
         spinner.addChangeListener(e -> {
-            radius = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
+            scale = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
             repaint();
         });
-        controlPanel.add(new Label("Radius"));
-        controlPanel.add(spinner);
-    }
-
-    private void setHeightSpinner(JPanel controlPanel) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(height, //initial value
-                                                           5, //min
-                                                           300, //max
-                                                           10);//step
-        JSpinner spinner = new JSpinner(spinnerModel);
-        spinner.addChangeListener(e -> {
-            height = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
-            repaint();
-        });
-        controlPanel.add(new Label("Height"));
+        controlPanel.add(new Label("Масштаб"));
         controlPanel.add(spinner);
     }
 
@@ -140,30 +124,30 @@ public class BezierPanel implements GraphicPanels {
             edges = ((JSlider) e.getSource()).getValue();
             repaint();
         });
-        controlPanel.add(new Label("edges"));
+        controlPanel.add(new Label("Сетка"));
         controlPanel.add(slider);
     }
 
     private void setNavigationButtons(JPanel controlPanel) {
-        JButton leftButton = new JButton("left");
+        JButton leftButton = new JButton("Повернуть влево");
         leftButton.addActionListener(e -> {
             fiAngle += 10;
             repaint();
         });
 
-        JButton rightButton = new JButton("right");
+        JButton rightButton = new JButton("Повернуть вправо");
         rightButton.addActionListener(e -> {
             fiAngle -= 10;
             repaint();
         });
 
-        JButton upButton = new JButton("up");
+        JButton upButton = new JButton("Повернуть вверх");
         upButton.addActionListener(e -> {
             thetaAngle -= 10;
             repaint();
         });
 
-        JButton downButton = new JButton("down");
+        JButton downButton = new JButton("Повернуть вниз");
         downButton.addActionListener(e -> {
             thetaAngle += 10;
             repaint();
@@ -181,11 +165,11 @@ public class BezierPanel implements GraphicPanels {
 
     private Function<Graphics, Drawing> newBezierFunction() {
         return graphics -> new WireframeDrawing(graphics,
-                                                new BezierPoints(sourcePoints, radius, height, edges, edges),
-                                                fiAngle, thetaAngle, showNormals, true);
+                                                new BezierPoints(sourcePoints, scale, scale, edges, edges),
+                                                fiAngle, thetaAngle, showNormals, true, false);
     }
 
     private Function<Graphics, Drawing> newFlatBezierFunction() {
-        return graphics -> new BezierFlat(sourcePoints, graphics, edges, radius, height);
+        return graphics -> new BezierFlat(sourcePoints, graphics, edges, scale, scale);
     }
 }

@@ -18,11 +18,13 @@ public class WireframeDrawing implements Drawing {
     private final IsometricTransformer isometricTransformer;
     private final boolean showNormal;
     private boolean isContinuous;
+    private boolean reverse;
 
-    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous) {
+    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse) {
         this.graphics = graphics;
         this.pointsGenerator = pointsGenerator;
         this.isContinuous = isContinuous;
+        this.reverse = reverse;
         this.isometricTransformer = new IsometricTransformer(fiAngle, thetaAngle);
         this.showNormal = showNormal;
     }
@@ -55,8 +57,13 @@ public class WireframeDrawing implements Drawing {
                                 isometricTransformer.transform(cylinderPoints[i + 1][(j + 1) % jMax]));
                     if (showNormal) {
                         if (canDrawLine) {
-                            drawNormal(point3D, cylinderPoints[i + 1][j], cylinderPoints[i + 1][(j + 1) % jMax]);
-                            drawNormal(cylinderPoints[i][(j + 1) % jMax], point3D, cylinderPoints[i + 1][(j + 1) % jMax]);
+                            if (reverse) {
+                                drawNormal(cylinderPoints[i + 1][j], point3D, cylinderPoints[i + 1][(j + 1) % jMax]);
+                                drawNormal(point3D, cylinderPoints[i][(j + 1) % jMax], cylinderPoints[i + 1][(j + 1) % jMax]);
+                            } else {
+                                drawNormal(point3D, cylinderPoints[i + 1][j], cylinderPoints[i + 1][(j + 1) % jMax]);
+                                drawNormal(cylinderPoints[i][(j + 1) % jMax], point3D, cylinderPoints[i + 1][(j + 1) % jMax]);
+                            }
                         }
                     }
                 }
@@ -71,7 +78,7 @@ public class WireframeDrawing implements Drawing {
         Vector n = v1.normal(v2);
         Point3D center = findCenter(a, b, c);
         Point3D vp = new Point3D(center.x - n.x * NORMAL_LENGTH, center.y - n.y * NORMAL_LENGTH, center.z - n.z * NORMAL_LENGTH);
-        graphics.line(isometricTransformer.transform(center), isometricTransformer.transform(vp), Color.red);
+        graphics.line(isometricTransformer.transform(center), isometricTransformer.transform(vp), Color.blue);
     }
 
     private Point3D findCenter(Point3D a, Point3D b, Point3D c) {
@@ -84,8 +91,8 @@ public class WireframeDrawing implements Drawing {
         Point3D oy = new Point3D(0, AXIS_LENGTH, 0);
         Point3D oz = new Point3D(0, 0, AXIS_LENGTH);
 
-        graphics.line(isometricTransformer.transform(ox));
-        graphics.line(isometricTransformer.transform(oy));
-        graphics.line(isometricTransformer.transform(oz));
+        graphics.line(isometricTransformer.transform(ox), Color.red);
+        graphics.line(isometricTransformer.transform(oy), Color.red);
+        graphics.line(isometricTransformer.transform(oz), Color.red);
     }
 }
