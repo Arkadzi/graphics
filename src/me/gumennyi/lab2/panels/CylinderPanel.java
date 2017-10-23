@@ -1,0 +1,107 @@
+package me.gumennyi.lab2.panels;
+
+import me.gumennyi.lab2.figures.Drawing;
+import me.gumennyi.lab2.figures.WireframeDrawing;
+import me.gumennyi.lab2.generator.CylinderPoints;
+import me.gumennyi.lab2.graphics.Graphics;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.function.Function;
+
+public class CylinderPanel implements GraphicPanels {
+    private static final int SIZE = 500;
+    private int fiAngle = 220;
+    private int thetaAngle = 60;
+    private GraphicCanvas canvas;
+    private JPanel panel;
+    private int edges = 10;
+    private int scale = 300;
+    private boolean showNormals;
+
+    public CylinderPanel() {
+        canvas = new GraphicCanvas(newCylinderFunction(), SIZE, SIZE);
+        init();
+    }
+
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    private void init() {
+        panel = new JPanel(new BorderLayout());
+        panel.add(canvas);
+        panel.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyReleased(KeyEvent e) {}
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case 37:
+                        fiAngle += 10;
+                        repaint();
+                        break;
+                    case 38:
+                        thetaAngle -= 10;
+                        repaint();
+                        break;
+                    case 39:
+                        fiAngle -= 10;
+                        repaint();
+                        break;
+                    case 40:
+                        thetaAngle += 10;
+                        repaint();
+                        break;
+                    case 107:
+                        scale += 10;
+                        repaint();
+                        break;
+                    case 109:
+                        if (scale > 10) {
+                            scale -= 10;
+                            repaint();
+                        }
+                        break;
+                    case 100:
+                        if (edges > 2) {
+                            edges -= 2;
+                            repaint();
+                        }
+                        break;
+                    case 102:
+                        edges += 2;
+                        repaint();
+                        break;
+                    case 78:
+                        showNormals = !showNormals;
+                        repaint();
+                        break;
+                }
+                System.out.println("Pressed " + e.getKeyCode());
+            }
+        });
+
+        panel.setFocusable(true);
+    }
+
+    private void repaint() {
+        canvas.setDrawingFunction(newCylinderFunction());
+        canvas.setBackground(Color.black);
+        canvas.repaint();
+    }
+
+    private Function<Graphics, Drawing> newCylinderFunction() {
+        return graphics -> new WireframeDrawing(graphics,
+                                                new CylinderPoints(scale, scale, edges, edges), fiAngle,
+                                                thetaAngle, showNormals, false, true);
+    }
+
+}
