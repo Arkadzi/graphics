@@ -8,5 +8,6 @@ import java.awt.*;
 public interface Graphics {
     void line(Point2D pointA, Point2D pointB);
     void line(Point2D point);
+    void line(Point2D point, Color color);
     void line(Point2D pointA, Point2D point2D, Color color);
 }

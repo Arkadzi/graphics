@@ -8,17 +8,18 @@ import io.github.solomkinmv.graphics.lab2.graphics.Graphics;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.function.Function;
 
 public class CylinderPanel implements GraphicPanels {
-    private static final int SIZE = 600;
+    private static final int SIZE = 500;
     private int fiAngle = 220;
     private int thetaAngle = 60;
     private GraphicCanvas canvas;
     private JPanel panel;
     private int edges = 10;
-    private int radius = 200;
-    private int height = 300;
+    private int scale = 300;
     private boolean showNormals;
 
     public CylinderPanel() {
@@ -31,112 +32,77 @@ public class CylinderPanel implements GraphicPanels {
     }
 
     private void init() {
-        panel = new JPanel();
+        panel = new JPanel(new BorderLayout());
         panel.add(canvas);
-        panel.add(createControls());
-    }
+        panel.addKeyListener(new KeyListener() {
 
-    private Component createControls() {
-        JPanel controlPanel = new JPanel(new GridLayout(6, 2));
+            @Override
+            public void keyTyped(KeyEvent e) {}
 
-        setNavigationButtons(controlPanel);
-        setEdgesSlider(controlPanel);
-        setRadiusSpinner(controlPanel);
-        setHeightSpinner(controlPanel);
-        setNormalsShowCheckBox(controlPanel);
+            @Override
+            public void keyReleased(KeyEvent e) {}
 
-        return controlPanel;
-    }
-
-    private void setNormalsShowCheckBox(JPanel controlPanel) {
-        JCheckBox normalsCheckBox = new JCheckBox("Show normals");
-        normalsCheckBox.addItemListener(e -> {
-            showNormals = e.getStateChange() == ItemEvent.SELECTED;
-            repaint();
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case 37:
+                        fiAngle += 10;
+                        repaint();
+                        break;
+                    case 38:
+                        thetaAngle -= 10;
+                        repaint();
+                        break;
+                    case 39:
+                        fiAngle -= 10;
+                        repaint();
+                        break;
+                    case 40:
+                        thetaAngle += 10;
+                        repaint();
+                        break;
+                    case 107:
+                        scale += 10;
+                        repaint();
+                        break;
+                    case 109:
+                        if (scale > 10) {
+                            scale -= 10;
+                            repaint();
+                        }
+                        break;
+                    case 100:
+                        if (edges > 2) {
+                            edges -= 2;
+                            repaint();
+                        }
+                        break;
+                    case 102:
+                        edges += 2;
+                        repaint();
+                        break;
+                    case 78:
+                        showNormals = !showNormals;
+                        repaint();
+                        break;
+                }
+                System.out.println("Pressed " + e.getKeyCode());
+            }
         });
-        controlPanel.add(normalsCheckBox);
-    }
 
-    private void setRadiusSpinner(JPanel controlPanel) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(200, //initial value
-                                                           20, //min
-                                                           300, //max
-                                                           20);//step
-        JSpinner spinner = new JSpinner(spinnerModel);
-        spinner.addChangeListener(e -> {
-            radius = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
-            repaint();
-        });
-        controlPanel.add(new Label("Radius"));
-        controlPanel.add(spinner);
-    }
-
-    private void setHeightSpinner(JPanel controlPanel) {
-        SpinnerModel spinnerModel = new SpinnerNumberModel(200, //initial value
-                                                           20, //min
-                                                           300, //max
-                                                           20);//step
-        JSpinner spinner = new JSpinner(spinnerModel);
-        spinner.addChangeListener(e -> {
-            height = ((Number) ((JSpinner) e.getSource()).getValue()).intValue();
-            repaint();
-        });
-        controlPanel.add(new Label("Height"));
-        controlPanel.add(spinner);
-    }
-
-    private void setEdgesSlider(JPanel controlPanel) {
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, 2, 50, edges);
-
-        slider.setValue(edges);
-        slider.addChangeListener(e -> {
-            edges = ((JSlider) e.getSource()).getValue();
-            repaint();
-        });
-        controlPanel.add(new Label("edges"));
-        controlPanel.add(slider);
+        panel.setFocusable(true);
     }
 
     private void repaint() {
         canvas.setDrawingFunction(newCylinderFunction());
+        canvas.setBackground(Color.black);
         canvas.repaint();
-    }
-
-    private void setNavigationButtons(JPanel controlPanel) {
-        JButton leftButton = new JButton("left");
-        leftButton.addActionListener(e -> {
-            fiAngle += 10;
-            repaint();
-        });
-
-        JButton rightButton = new JButton("right");
-        rightButton.addActionListener(e -> {
-            fiAngle -= 10;
-            repaint();
-        });
-
-        JButton upButton = new JButton("up");
-        upButton.addActionListener(e -> {
-            thetaAngle -= 10;
-            repaint();
-        });
-
-        JButton downButton = new JButton("down");
-        downButton.addActionListener(e -> {
-            thetaAngle += 10;
-            repaint();
-        });
-
-        controlPanel.add(leftButton);
-        controlPanel.add(rightButton);
-        controlPanel.add(upButton);
-        controlPanel.add(downButton);
     }
 
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
-                                                new CylinderPoints(radius, height, edges, edges), fiAngle,
-                                                thetaAngle, showNormals, false);
+                                                new CylinderPoints(scale, scale, edges, edges), fiAngle,
+                                                thetaAngle, showNormals, false, true);
     }
 
 }

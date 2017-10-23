@@ -4,12 +4,14 @@ import io.github.solomkinmv.graphics.lab2.panels.BezierPanel;
 import io.github.solomkinmv.graphics.lab2.panels.CylinderPanel;
 import io.github.solomkinmv.graphics.lab2.panels.GraphicPanels;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Application {
     public static void main(String[] args) {
+
         bezier();
         cylinder();
     }
@@ -30,6 +32,15 @@ public class Application {
             }
         });
         frame.add(graphicPanels.getPanel());
+        try {
+            UIManager.setLookAndFeel(
+                    UIManager.getInstalledLookAndFeels()[1].getClassName());
+//            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            SwingUtilities.updateComponentTreeUI(frame);
+//            frame.pack();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         frame.pack();
         frame.setVisible(true);
     }

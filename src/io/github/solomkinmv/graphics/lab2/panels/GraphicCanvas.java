@@ -26,8 +26,8 @@ public class GraphicCanvas extends Canvas {
 
     @Override
     public void paint(java.awt.Graphics g) {
-        setBackground(Color.white);
-        g.setColor(Color.black);
+        setBackground(Color.black);
+        g.setColor(Color.white);
 
         drawingFunction.apply(
                 new CenteredGraphics(new DefaultGraphics(g),
