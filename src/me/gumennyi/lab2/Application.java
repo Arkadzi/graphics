@@ -1,7 +1,7 @@
 package me.gumennyi.lab2;
 
 import me.gumennyi.lab2.panels.BezierPanel;
-import me.gumennyi.lab2.panels.CylinderPanel;
+import me.gumennyi.lab2.panels.ParabolCylinderPanel;
 import me.gumennyi.lab2.panels.GraphicPanels;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ public class Application {
     }
 
     private static void cylinder() {
-        createFrame(new CylinderPanel());
+        createFrame(new ParabolCylinderPanel());
     }
 
     private static void bezier() {

@@ -2,7 +2,7 @@ package me.gumennyi.lab2.panels;
 
 import me.gumennyi.lab2.figures.Drawing;
 import me.gumennyi.lab2.figures.WireframeDrawing;
-import me.gumennyi.lab2.generator.CylinderPoints;
+import me.gumennyi.lab2.generator.ParabolCylinderPoints;
 import me.gumennyi.lab2.graphics.Graphics;
 
 import javax.swing.*;
@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.function.Function;
 
-public class CylinderPanel implements GraphicPanels {
+public class ParabolCylinderPanel implements GraphicPanels {
     private static final int SIZE = 500;
     private int fiAngle = 220;
     private int thetaAngle = 60;
@@ -21,7 +21,7 @@ public class CylinderPanel implements GraphicPanels {
     private int scale = 300;
     private boolean showNormals;
 
-    public CylinderPanel() {
+    public ParabolCylinderPanel() {
         canvas = new GraphicCanvas(newCylinderFunction(), SIZE, SIZE);
         init();
     }
@@ -100,7 +100,7 @@ public class CylinderPanel implements GraphicPanels {
 
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
-                                                new CylinderPoints(scale, scale, edges, edges), fiAngle,
+                                                new ParabolCylinderPoints(scale, scale, edges, edges), fiAngle,
                                                 thetaAngle, showNormals, false, true);
     }
 

@@ -4,21 +4,21 @@ import me.gumennyi.lab2.types.Point3D;
 
 import java.util.stream.DoubleStream;
 
-public class CylinderPoints implements PointsGenerator {
+public class ParabolCylinderPoints implements PointsGenerator {
 
     private final int r;
     private final int h;
     private final int hParts;
     private final int vParts;
 
-    public CylinderPoints(int r, int h, int hParts, int vParts) {
+    public ParabolCylinderPoints(int r, int h, int hParts, int vParts) {
         this.r = r;
         this.h = h;
         this.hParts = hParts;
         this.vParts = vParts;
     }
 
-    public CylinderPoints(int r, int h) {
+    public ParabolCylinderPoints(int r, int h) {
         this.r = r;
         this.h = h;
         vParts = 10;
@@ -34,20 +34,12 @@ public class CylinderPoints implements PointsGenerator {
                 .toArray(Point3D[][]::new);
     }
 
-//    private double getRad(double u) {
-//        return 2 * Math.PI * u;
-//    }
-
     private Point3D[] generatePointsLayer(double v) {
         double step = 1. / hParts;
 
         return DoubleStream.iterate(-1, y -> y <= 1, y -> y + step)
                 .mapToObj(y -> getPoint(y, v))
                 .toArray(Point3D[]::new);
-//
-//        return DoubleStream.iterate(0, (u) -> u <= 1, (u) -> u + step)
-//                           .mapToObj(u -> getPoint(u, v))
-//                           .toArray(Point3D[]::new);
     }
 
     private Point3D getPoint(double y, double v) {
