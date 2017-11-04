@@ -1,4 +1,4 @@
-package me.gumennyi.lab2.figures;
+package me.gumennyi.lab2.draw;
 
 import me.gumennyi.lab2.generator.PointsGenerator;
 import me.gumennyi.lab2.graphics.Graphics;

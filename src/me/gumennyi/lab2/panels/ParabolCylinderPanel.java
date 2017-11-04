@@ -1,7 +1,7 @@
 package me.gumennyi.lab2.panels;
 
-import me.gumennyi.lab2.figures.Drawing;
-import me.gumennyi.lab2.figures.WireframeDrawing;
+import me.gumennyi.lab2.draw.Drawing;
+import me.gumennyi.lab2.draw.WireframeDrawing;
 import me.gumennyi.lab2.generator.ParabolCylinderPoints;
 import me.gumennyi.lab2.graphics.Graphics;
 

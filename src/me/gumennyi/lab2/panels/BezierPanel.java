@@ -1,8 +1,8 @@
 package me.gumennyi.lab2.panels;
 
-import me.gumennyi.lab2.figures.BezierFlat;
-import me.gumennyi.lab2.figures.Drawing;
-import me.gumennyi.lab2.figures.WireframeDrawing;
+import me.gumennyi.lab2.draw.BezierFlat;
+import me.gumennyi.lab2.draw.Drawing;
+import me.gumennyi.lab2.draw.WireframeDrawing;
 import me.gumennyi.lab2.generator.BezierPoints;
 import me.gumennyi.lab2.graphics.Graphics;
 import me.gumennyi.lab2.types.Point2D;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class BezierPanel implements GraphicPanels {
     private static final int SIZE = 500;
-    private final GraphicCanvas flatCanvas;
+//    private final GraphicCanvas flatCanvas;
     private JPanel panel;
     private GraphicCanvas canvas;
     private int fiAngle = 220;
@@ -26,13 +26,13 @@ public class BezierPanel implements GraphicPanels {
     private int edges = 10;
     private int scale = 30;
     private boolean showNormals;
-    private String bezierPoints = "1,1;5,7;8,2;10,10;15,12";
+    private String bezierPoints = "1,1;2,2;3,6";
     private List<Point2D> sourcePoints;
 
     public BezierPanel() {
         parseBezierPoints();
         canvas = new GraphicCanvas(newBezierFunction(), SIZE, SIZE);
-        flatCanvas = new GraphicCanvas(newFlatBezierFunction(), SIZE, SIZE);
+//        flatCanvas = new GraphicCanvas(newFlatBezierFutenction(), SIZE, SIZE);
         init();
     }
 
@@ -40,7 +40,7 @@ public class BezierPanel implements GraphicPanels {
         panel = new JPanel(new GridLayout(2,2));
         panel.add(canvas);
 
-        panel.add(createFlatPanel());
+//        panel.add(createFlatPanel());
         panel.add(createControls());
         panel.addKeyListener(new KeyListener() {
 
@@ -103,11 +103,11 @@ public class BezierPanel implements GraphicPanels {
         panel.setFocusable(true);
     }
 
-    private Component createFlatPanel() {
-        JPanel panel = new JPanel();
-        panel.add(flatCanvas);
-        return panel;
-    }
+//    private Component createFlatPanel() {
+//        JPanel panel = new JPanel();
+//        panel.add(flatCanvas);
+//        return panel;
+//    }
 
     private Component createControls() {
         JPanel controlPanel = new JPanel(new GridLayout(7, 2));
@@ -143,8 +143,8 @@ public class BezierPanel implements GraphicPanels {
         canvas.setDrawingFunction(newBezierFunction());
         canvas.repaint();
 
-        flatCanvas.setDrawingFunction(newFlatBezierFunction());
-        flatCanvas.repaint();
+//        flatCanvas.setDrawingFunction(newFlatBezierFunction());
+//        flatCanvas.repaint();
     }
 
     public JPanel getPanel() {
