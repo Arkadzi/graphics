@@ -21,6 +21,9 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private int scale = 300;
     private boolean showNormals;
     private Color lineColor;
+    private int lightShiftFi = 0;
+    private int lightShiftTheta = 0;
+    private double factor;
 
 
     public ParabolCylinderPanel() {
@@ -90,6 +93,34 @@ public class ParabolCylinderPanel implements GraphicPanels {
                         lineColor = lineColor == null ? Color.black : null;
                         repaint();
                         break;
+                    case 65:
+                        lightShiftFi -= 5;
+                        repaint();
+                        break;
+                    case 68:
+                        lightShiftFi += 5;
+                        repaint();
+                        break;
+                    case 87:
+                        lightShiftTheta += 5;
+                        repaint();
+                        break;
+                    case 83:
+                        lightShiftTheta -= 5;
+                        repaint();
+                        break;
+                    case 70:
+                        if (factor > -0.9) {
+                            factor -= 0.1;
+                            repaint();
+                        }
+                        break;
+                    case 71:
+                        if (factor < 1) {
+                            factor += 0.1;
+                            repaint();
+                        }
+                        break;
                 }
                 System.out.println("Pressed " + e.getKeyCode());
             }
@@ -107,7 +138,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
                                                 new ParabolCylinderPoints(scale, scale, edges, edges), fiAngle,
-                                                thetaAngle, showNormals, false, true, lineColor);
+                                                thetaAngle, showNormals, false, true, lineColor, lightShiftFi, lightShiftTheta, factor);
     }
 
 }

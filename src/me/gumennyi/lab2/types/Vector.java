@@ -26,8 +26,12 @@ public class Vector {
     }
 
     public double angle(Vector vector) {
-        double v = x * vector.x + y * vector.y + z * vector.z;
+        double v = dot(vector);
         return Utils.radToDeg(Math.acos(v / length() / vector.length()));
+    }
+
+    public double dot(Vector vector) {
+        return x * vector.x + y * vector.y + z * vector.z;
     }
 
     public Vector normal(Vector otherVector) {

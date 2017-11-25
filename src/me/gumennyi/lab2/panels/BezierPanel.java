@@ -18,17 +18,20 @@ import java.util.stream.Collectors;
 
 public class BezierPanel implements GraphicPanels {
     private static final int SIZE = 500;
-//    private final GraphicCanvas flatCanvas;
+    //    private final GraphicCanvas flatCanvas;
     private JPanel panel;
     private GraphicCanvas canvas;
     private int fiAngle = 20;
     private int thetaAngle = -260;
+    private int lightShiftFi = 0;
+    private int lightShiftTheta = 0;
     private int edges = 10;
     private int scale = 30;
     private boolean showNormals;
     private String bezierPoints = "1,0;2,2;3,6;4,2;6,0";
     private List<Point2D> sourcePoints;
     private Color lineColor;
+    private double factor;
 
     public BezierPanel() {
         parseBezierPoints();
@@ -38,7 +41,7 @@ public class BezierPanel implements GraphicPanels {
     }
 
     private void init() {
-        panel = new JPanel(new GridLayout(2,2));
+        panel = new JPanel(new GridLayout(2, 2));
         panel.add(canvas);
 
 //        panel.add(createFlatPanel());
@@ -100,6 +103,35 @@ public class BezierPanel implements GraphicPanels {
                         lineColor = lineColor == null ? Color.black : null;
                         repaint();
                         break;
+                    case 65:
+                        lightShiftFi -= 5;
+                        repaint();
+                        break;
+                    case 68:
+                        lightShiftFi += 5;
+                        repaint();
+                        break;
+                    case 87:
+                        lightShiftTheta += 5;
+                        repaint();
+                        break;
+                    case 83:
+                        lightShiftTheta -= 5;
+                        repaint();
+                        break;
+                    case 70:
+                        if (factor > -0.9) {
+                            factor -= 0.1;
+                            repaint();
+                        }
+                        break;
+                    case 71:
+                        if (factor < 1) {
+                            factor += 0.1;
+                            repaint();
+                        }
+                        break;
+
                 }
                 System.out.println("Pressed " + e.getKeyCode());
             }
@@ -159,7 +191,7 @@ public class BezierPanel implements GraphicPanels {
     private Function<me.gumennyi.lab2.graphics.Graphics, Drawing> newFunction() {
         return graphics -> new WireframeDrawing(graphics,
                 new BezierPoints(sourcePoints, scale, scale, edges, edges),
-                fiAngle, thetaAngle, showNormals, true, false, lineColor);
+                fiAngle, thetaAngle, showNormals, true, false, lineColor, lightShiftFi, lightShiftTheta, factor);
     }
 
     private Function<Graphics, Drawing> newFlatBezierFunction() {

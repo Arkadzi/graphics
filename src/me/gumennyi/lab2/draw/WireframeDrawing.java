@@ -20,18 +20,22 @@ public class WireframeDrawing implements Drawing {
     private final IsometricTransformer isometricTransformer;
     private final boolean showNormal;
     private final Vector cameraVector;
+    private final Vector lightVector;
     private boolean isContinuous;
     private boolean reverse;
     private Color lineColor;
+    private double factor;
 
-    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse, Color lineColor) {
+    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse, Color lineColor, int lightShiftFi, int lightShiftTheta, double factor) {
         this.graphics = graphics;
         this.pointsGenerator = pointsGenerator;
         this.isContinuous = isContinuous;
         this.reverse = reverse;
         this.lineColor = lineColor;
+        this.factor = factor;
         this.isometricTransformer = new IsometricTransformer(fiAngle, thetaAngle);
         cameraVector = getCameraPoint(fiAngle, thetaAngle);
+        lightVector = getCameraPoint(fiAngle - lightShiftFi, thetaAngle - lightShiftTheta);
 
         System.out.println(fiAngle + " " + thetaAngle + " " + cameraVector);
         this.showNormal = showNormal;
@@ -39,7 +43,7 @@ public class WireframeDrawing implements Drawing {
 
 
     private Vector getCameraPoint(int fiAngle, int thetaAngle) {
-        int s = 1000;
+        int s = 1;
         double fiDeg = Utils.degToRad(fiAngle);
         double thetaDeg = Utils.degToRad(thetaAngle);
         double x = s * Math.sin(fiDeg);
@@ -72,9 +76,11 @@ public class WireframeDrawing implements Drawing {
 
             System.out.println(angle);
             if (angle < 90) {
-                int v = 100 + (int) ((90 - angle) / 90 * 100);
-
-                graphics.drawPolygon(new Polygon<>(a,b,c), new Color(v,v,v), lineColor);
+//                double lightAngle = normal.angle(lightVector);
+//                int v = 100 + (int) ((90 - lightAngle) / 90 * 100);
+                double lambert = Math.max(normal.dot(lightVector) + factor, 0);
+                int v = (int) (lambert * 200 / (1+factor));
+                graphics.drawPolygon(new Polygon<>(a,b,c), new Color(v,0,0), lineColor);
 //                graphics.line(a, b);
 //                graphics.line(a, c);
 //                graphics.line(b, c);
@@ -143,6 +149,7 @@ public class WireframeDrawing implements Drawing {
 //        graphics.line(x8, x5, red);
 
         graphics.line(isometricTransformer.transform(new Point3D(cameraVector.x, cameraVector.y, cameraVector.z)), Color.green);
+        graphics.line(isometricTransformer.transform(new Point3D(lightVector.x, lightVector.y, lightVector.z)), Color.magenta);
 
 //        graphics.line(isometricTransformer.transform(x2), red);
 //        graphics.line(isometricTransformer.transform(x3), red);
