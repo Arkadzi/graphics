@@ -21,17 +21,18 @@ public class BezierPanel implements GraphicPanels {
 //    private final GraphicCanvas flatCanvas;
     private JPanel panel;
     private GraphicCanvas canvas;
-    private int fiAngle = 220;
-    private int thetaAngle = 60;
+    private int fiAngle = 20;
+    private int thetaAngle = -260;
     private int edges = 10;
     private int scale = 30;
     private boolean showNormals;
-    private String bezierPoints = "1,1;2,2;3,6";
+    private String bezierPoints = "1,0;2,2;3,6;4,2;6,0";
     private List<Point2D> sourcePoints;
+    private Color lineColor;
 
     public BezierPanel() {
         parseBezierPoints();
-        canvas = new GraphicCanvas(newBezierFunction(), SIZE, SIZE);
+        canvas = new GraphicCanvas(newFunction(), SIZE, SIZE);
 //        flatCanvas = new GraphicCanvas(newFlatBezierFutenction(), SIZE, SIZE);
         init();
     }
@@ -95,6 +96,10 @@ public class BezierPanel implements GraphicPanels {
                         showNormals = !showNormals;
                         repaint();
                         break;
+                    case 76:
+                        lineColor = lineColor == null ? Color.black : null;
+                        repaint();
+                        break;
                 }
                 System.out.println("Pressed " + e.getKeyCode());
             }
@@ -140,7 +145,7 @@ public class BezierPanel implements GraphicPanels {
     }
 
     private void repaint() {
-        canvas.setDrawingFunction(newBezierFunction());
+        canvas.setDrawingFunction(newFunction());
         canvas.repaint();
 
 //        flatCanvas.setDrawingFunction(newFlatBezierFunction());
@@ -151,10 +156,10 @@ public class BezierPanel implements GraphicPanels {
         return panel;
     }
 
-    private Function<me.gumennyi.lab2.graphics.Graphics, Drawing> newBezierFunction() {
+    private Function<me.gumennyi.lab2.graphics.Graphics, Drawing> newFunction() {
         return graphics -> new WireframeDrawing(graphics,
                 new BezierPoints(sourcePoints, scale, scale, edges, edges),
-                fiAngle, thetaAngle, showNormals, true, false);
+                fiAngle, thetaAngle, showNormals, true, false, lineColor);
     }
 
     private Function<Graphics, Drawing> newFlatBezierFunction() {

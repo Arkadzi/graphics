@@ -20,6 +20,8 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private int edges = 10;
     private int scale = 300;
     private boolean showNormals;
+    private Color lineColor;
+
 
     public ParabolCylinderPanel() {
         canvas = new GraphicCanvas(newCylinderFunction(), SIZE, SIZE);
@@ -84,6 +86,10 @@ public class ParabolCylinderPanel implements GraphicPanels {
                         showNormals = !showNormals;
                         repaint();
                         break;
+                    case 76:
+                        lineColor = lineColor == null ? Color.black : null;
+                        repaint();
+                        break;
                 }
                 System.out.println("Pressed " + e.getKeyCode());
             }
@@ -101,7 +107,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
                                                 new ParabolCylinderPoints(scale, scale, edges, edges), fiAngle,
-                                                thetaAngle, showNormals, false, true);
+                                                thetaAngle, showNormals, false, true, lineColor);
     }
 
 }

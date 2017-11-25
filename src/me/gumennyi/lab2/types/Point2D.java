@@ -1,6 +1,6 @@
 package me.gumennyi.lab2.types;
 
-public class Point2D {
+public class Point2D extends Point {
     public final double x;
     public final double y;
 
@@ -19,9 +19,7 @@ public class Point2D {
 
     @Override
     public String toString() {
-        return "Point2D{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return x / 200 +
+                " " + y / 200;
     }
 }

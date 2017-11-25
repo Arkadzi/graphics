@@ -1,5 +1,7 @@
 package me.gumennyi.lab2.types;
 
+import me.gumennyi.lab2.graphics.Utils;
+
 public class Vector {
     public final double x;
     public final double y;
@@ -21,6 +23,11 @@ public class Vector {
         return new Vector(y * otherVector.z - z * otherVector.y,
                           z * otherVector.x - x * otherVector.z,
                           x * otherVector.y - y * otherVector.x);
+    }
+
+    public double angle(Vector vector) {
+        double v = x * vector.x + y * vector.y + z * vector.z;
+        return Utils.radToDeg(Math.acos(v / length() / vector.length()));
     }
 
     public Vector normal(Vector otherVector) {

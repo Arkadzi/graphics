@@ -1,6 +1,7 @@
 package me.gumennyi.lab2.graphics;
 
 import me.gumennyi.lab2.types.Point2D;
+import me.gumennyi.lab2.types.Polygon;
 
 import java.awt.*;
 
@@ -19,6 +20,12 @@ public class CenteredGraphics implements Graphics {
         Point2D aCentered = toCentered(a);
         Point2D bCentered = toCentered(b);
         graphics.line(aCentered, bCentered);
+    }
+
+
+    @Override
+    public void drawPolygon(Polygon<Point2D> polygon, Color color, Color lineColor) {
+        graphics.drawPolygon(new Polygon<>(toCentered(polygon.getA()), toCentered(polygon.getB()), toCentered(polygon.getC())), color, lineColor);
     }
 
     @Override

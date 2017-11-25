@@ -3,8 +3,10 @@ package me.gumennyi.lab2.draw;
 import me.gumennyi.lab2.generator.PointsGenerator;
 import me.gumennyi.lab2.graphics.Graphics;
 import me.gumennyi.lab2.graphics.IsometricTransformer;
+import me.gumennyi.lab2.graphics.Utils;
 import me.gumennyi.lab2.types.Point2D;
 import me.gumennyi.lab2.types.Point3D;
+import me.gumennyi.lab2.types.Polygon;
 import me.gumennyi.lab2.types.Vector;
 
 import java.awt.*;
@@ -17,66 +19,75 @@ public class WireframeDrawing implements Drawing {
     private final me.gumennyi.lab2.graphics.Graphics graphics;
     private final IsometricTransformer isometricTransformer;
     private final boolean showNormal;
+    private final Vector cameraVector;
     private boolean isContinuous;
     private boolean reverse;
+    private Color lineColor;
 
-    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse) {
+    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse, Color lineColor) {
         this.graphics = graphics;
         this.pointsGenerator = pointsGenerator;
         this.isContinuous = isContinuous;
         this.reverse = reverse;
+        this.lineColor = lineColor;
         this.isometricTransformer = new IsometricTransformer(fiAngle, thetaAngle);
+        cameraVector = getCameraPoint(fiAngle, thetaAngle);
+
+        System.out.println(fiAngle + " " + thetaAngle + " " + cameraVector);
         this.showNormal = showNormal;
+    }
+
+
+    private Vector getCameraPoint(int fiAngle, int thetaAngle) {
+        int s = 1000;
+        double fiDeg = Utils.degToRad(fiAngle);
+        double thetaDeg = Utils.degToRad(thetaAngle);
+        double x = s * Math.sin(fiDeg);
+        double y = s * Math.cos(fiDeg);
+        Point3D point3D = new Point3D(
+                x * Math.sin(thetaDeg),
+                y * Math.sin(thetaDeg),
+                -s * Math.cos(thetaDeg)
+        );
+        return new Vector(new Point3D(0,0,0), point3D);
     }
 
 
     @Override
     public void draw() {
         drawAxis();
-        drawFigure();
+        drawFigure(pointsGenerator, reverse);
     }
 
-    private void drawFigure() {
+    private void drawFigure(PointsGenerator pointsGenerator, boolean reverse) {
         Point3D[][] cylinderPoints = pointsGenerator.generatePoints();
+        Polygon<Point3D>[] convert = Utils.convert(cylinderPoints, reverse);
+        for (Polygon<Point3D> polygon : convert) {
+            Point2D a = isometricTransformer.transform(polygon.getA());
+            Point2D b = isometricTransformer.transform(polygon.getB());
+            Point2D c = isometricTransformer.transform(polygon.getC());
 
-        for (int i = 0; i < cylinderPoints.length; i++) {
-            for (int j = 0; j < cylinderPoints[i].length; j++) {
-                Point3D point3D = cylinderPoints[i][j];
-                Point2D transoformedPoint = isometricTransformer.transform(point3D);
-                int jMax = cylinderPoints[i].length;
+            Vector normal = Utils.getNormal(polygon);
+            double angle = normal.angle(cameraVector);
 
-                boolean canDrawLine = isContinuous || j + 1 < jMax;
-                if (canDrawLine)
-                    graphics.line(transoformedPoint, isometricTransformer.transform(cylinderPoints[i][(j + 1) % jMax]));
-                int iMax = cylinderPoints.length - 1;
-                boolean hasTopPoint = i < iMax;
-                if (hasTopPoint) {
-                    graphics.line(transoformedPoint, isometricTransformer.transform(cylinderPoints[i + 1][j]));
-                    if (canDrawLine)
-                        graphics.line(transoformedPoint,
-                                isometricTransformer.transform(cylinderPoints[i + 1][(j + 1) % jMax]));
-                    if (showNormal) {
-                        if (canDrawLine) {
-                            if (reverse) {
-                                drawNormal(cylinderPoints[i + 1][j], point3D, cylinderPoints[i + 1][(j + 1) % jMax]);
-                                drawNormal(point3D, cylinderPoints[i][(j + 1) % jMax], cylinderPoints[i + 1][(j + 1) % jMax]);
-                            } else {
-                                drawNormal(point3D, cylinderPoints[i + 1][j], cylinderPoints[i + 1][(j + 1) % jMax]);
-                                drawNormal(cylinderPoints[i][(j + 1) % jMax], point3D, cylinderPoints[i + 1][(j + 1) % jMax]);
-                            }
-                        }
-                    }
+            System.out.println(angle);
+            if (angle < 90) {
+                int v = 100 + (int) ((90 - angle) / 90 * 100);
+
+                graphics.drawPolygon(new Polygon<>(a,b,c), new Color(v,v,v), lineColor);
+//                graphics.line(a, b);
+//                graphics.line(a, c);
+//                graphics.line(b, c);
+                if (showNormal) {
+                    drawNormal(polygon);
                 }
             }
         }
     }
 
-    private void drawNormal(Point3D a, Point3D b, Point3D c) {
-        Vector v1 = new Vector(a, b);
-        Vector v2 = new Vector(a, c);
-
-        Vector n = v1.normal(v2);
-        Point3D center = findCenter(a, b, c);
+    private void drawNormal(Polygon<Point3D> polygon) {
+        Vector n = Utils.getNormal(polygon);
+        Point3D center = findCenter(polygon.getA(), polygon.getB(), polygon.getC());
         Point3D vp = new Point3D(center.x - n.x * NORMAL_LENGTH, center.y - n.y * NORMAL_LENGTH, center.z - n.z * NORMAL_LENGTH);
         graphics.line(isometricTransformer.transform(center), isometricTransformer.transform(vp), Color.green);
     }
@@ -91,8 +102,58 @@ public class WireframeDrawing implements Drawing {
         Point3D oy = new Point3D(0, AXIS_LENGTH, 0);
         Point3D oz = new Point3D(0, 0, AXIS_LENGTH);
 
+//        int i = 3;
+//        int x = AXIS_LENGTH / i;
+//        Point2D x1 = isometricTransformer.transform(new Point3D(0, 0, 0));
+//        Point2D x2 = isometricTransformer.transform(new Point3D(x, 0, 0));
+//        Point2D x3 = isometricTransformer.transform(new Point3D(0, x, 0));
+//        Point2D x4 = isometricTransformer.transform(new Point3D(0, 0, x));
+//        Point2D x5 = isometricTransformer.transform(new Point3D(x, x, 0));
+//        Point2D x6 = isometricTransformer.transform(new Point3D(0, x, x));
+//        Point2D x7 = isometricTransformer.transform(new Point3D(x, 0, x));
+//        Point2D x8 = isometricTransformer.transform(new Point3D(x, x, x));
+//        System.out.println();
+//        System.out.println("000 -> " + x1);
+//        System.out.println("1 0 0 -> " + x2);
+//        System.out.println("0 1 0 -> " + x3);
+//        System.out.println("0 0 1 -> " + x4);
+//        System.out.println("1 1 0 -> " + x5);
+//        System.out.println("0 1 1 -> " + x6);
+//        System.out.println("1 0 1 -> " + x7);
+//        System.out.println("1 1 1 -> " + x8);
+//        Vector normal = new Vector(ox, oy).normal(new Vector(ox, oz));
+
+
         graphics.line(isometricTransformer.transform(ox), Color.blue);
         graphics.line(isometricTransformer.transform(oy), Color.blue);
         graphics.line(isometricTransformer.transform(oz), Color.blue);
+
+//        Color red = Color.red;
+//        graphics.line(x1, x2, red);
+//        graphics.line(x1, x3, red);
+//        graphics.line(x1, x4, red);
+//        graphics.line(x2, x5, red);
+//        graphics.line(x2, x7, red);
+//        graphics.line(x3, x6, red);
+//        graphics.line(x3, x5, red);
+//        graphics.line(x4, x7, red);
+//        graphics.line(x4, x6, red);
+//        graphics.line(x8, x6, red);
+//        graphics.line(x8, x7, red);
+//        graphics.line(x8, x5, red);
+
+        graphics.line(isometricTransformer.transform(new Point3D(cameraVector.x, cameraVector.y, cameraVector.z)), Color.green);
+
+//        graphics.line(isometricTransformer.transform(x2), red);
+//        graphics.line(isometricTransformer.transform(x3), red);
+//        graphics.line(isometricTransformer.transform(x4), red);
+//        graphics.line(isometricTransformer.transform(x5), red);
+//        graphics.line(isometricTransformer.transform(x6), red);
+//        graphics.line(isometricTransformer.transform(x7), red);
+//        graphics.line(isometricTransformer.transform(x8), red);
+
+//        graphics.line(isometricTransformer.transform(cameraVector), Color.red);
+//        graphics.line(isometricTransformer.transform(new Point3D(normal.x * 100, normal.y * 100, normal.z * 100)));
+
     }
 }

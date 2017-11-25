@@ -1,6 +1,6 @@
 package me.gumennyi.lab2.types;
 
-public class Point3D {
+public class Point3D extends Point {
     public final double x;
     public final double y;
     public final double z;
