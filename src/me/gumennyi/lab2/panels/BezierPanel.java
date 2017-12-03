@@ -25,10 +25,10 @@ public class BezierPanel implements GraphicPanels {
     private int thetaAngle = -260;
     private int lightShiftFi = 0;
     private int lightShiftTheta = 0;
-    private int edges = 10;
+    private int edges = 100;
     private int scale = 30;
     private boolean showNormals;
-    private String bezierPoints = "1,0;2,2;3,6;4,2;6,0";
+    private String bezierPoints = "-5,0;-4.9,1;-4.3,2.5;-4,3;-3,4;-2.5,4.3;-1,4.9;0,5;1,4.9;2.5,4.3;3,4;4,3;4.3,2.5;4.9,1;5,0";
     private List<Point2D> sourcePoints;
     private Color lineColor;
     private double factor;
@@ -133,7 +133,7 @@ public class BezierPanel implements GraphicPanels {
                         break;
 
                 }
-                System.out.println("Pressed " + e.getKeyCode());
+//                System.out.println("Pressed " + e.getKeyCode());
             }
         });
 
@@ -169,7 +169,7 @@ public class BezierPanel implements GraphicPanels {
     private void parseBezierPoints() {
         Function<String, Point2D> stringToPoint = (str) -> {
             String[] xyChunks = str.split(",");
-            return new Point2D(Integer.parseInt(xyChunks[0]), Integer.parseInt(xyChunks[1]));
+            return new Point2D(Float.parseFloat(xyChunks[0]), Float.parseFloat(xyChunks[1]));
         };
         sourcePoints = Arrays.stream(bezierPoints.split(";"))
                 .map(stringToPoint)

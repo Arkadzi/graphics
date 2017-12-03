@@ -5,11 +5,14 @@ import me.gumennyi.lab2.types.Point2D;
 import me.gumennyi.lab2.types.Polygon;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public interface Graphics {
     void line(Point2D pointA, Point2D pointB);
     void line(Point2D point);
-    void drawPolygon(Polygon<Point2D> polygon, Color color, Color lineColor);
+    void drawPolygon(Polygon<Point2D> polygon2D, double lambert, BufferedImage image, Color lineColor);
     void line(Point2D point, Color color);
     void line(Point2D pointA, Point2D point2D, Color color);
+
+//    void drawPolygon();
 }

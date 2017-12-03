@@ -3,6 +3,7 @@ package me.gumennyi.lab2;
 import me.gumennyi.lab2.panels.BezierPanel;
 import me.gumennyi.lab2.panels.ParabolCylinderPanel;
 import me.gumennyi.lab2.panels.GraphicPanels;
+import org.ejml.simple.SimpleMatrix;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,9 +12,14 @@ import java.awt.event.WindowEvent;
 
 public class Application {
     public static void main(String[] args) {
-
+//        SimpleMatrix matrix = new SimpleMatrix(new double[][]{{1, 2, 3}, {1, 2, 3}, {1, 2, 3}});
+//        SimpleMatrix matrix1 = new SimpleMatrix(new double[][]{{1}, {2}, {3}});
+//        double v = matrix1.get(1, 0);
+//        System.out.println(v);
+//        SimpleMatrix mult = matrix1.mult(matrix);
+//        System.out.println(mult);
         bezier();
-        cylinder();
+//        cylinder();
     }
 
     private static void cylinder() {

@@ -122,7 +122,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
                         }
                         break;
                 }
-                System.out.println("Pressed " + e.getKeyCode());
+//                System.out.println("Pressed " + e.getKeyCode());
             }
         });
 

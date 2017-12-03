@@ -19,7 +19,7 @@ public class Point2D extends Point {
 
     @Override
     public String toString() {
-        return x / 200 +
-                " " + y / 200;
+        return x +
+                " " + y;
     }
 }

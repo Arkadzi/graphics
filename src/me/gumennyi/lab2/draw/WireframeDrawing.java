@@ -9,7 +9,11 @@ import me.gumennyi.lab2.types.Point3D;
 import me.gumennyi.lab2.types.Polygon;
 import me.gumennyi.lab2.types.Vector;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class WireframeDrawing implements Drawing {
 
@@ -21,12 +25,18 @@ public class WireframeDrawing implements Drawing {
     private final boolean showNormal;
     private final Vector cameraVector;
     private final Vector lightVector;
+    private BufferedImage image;
     private boolean isContinuous;
     private boolean reverse;
     private Color lineColor;
     private double factor;
 
     public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse, Color lineColor, int lightShiftFi, int lightShiftTheta, double factor) {
+        try {
+            image = ImageIO.read(new File("Jupiter.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.graphics = graphics;
         this.pointsGenerator = pointsGenerator;
         this.isContinuous = isContinuous;
@@ -37,7 +47,7 @@ public class WireframeDrawing implements Drawing {
         cameraVector = getCameraPoint(fiAngle, thetaAngle);
         lightVector = getCameraPoint(fiAngle - lightShiftFi, thetaAngle - lightShiftTheta);
 
-        System.out.println(fiAngle + " " + thetaAngle + " " + cameraVector);
+//        System.out.println(fiAngle + " " + thetaAngle + " " + cameraVector);
         this.showNormal = showNormal;
     }
 
@@ -66,6 +76,7 @@ public class WireframeDrawing implements Drawing {
     private void drawFigure(PointsGenerator pointsGenerator, boolean reverse) {
         Point3D[][] cylinderPoints = pointsGenerator.generatePoints();
         Polygon<Point3D>[] convert = Utils.convert(cylinderPoints, reverse);
+     //   System.out.println(convert[0].getvTotal() + " " + convert[0].gethTotal());
         for (Polygon<Point3D> polygon : convert) {
             Point2D a = isometricTransformer.transform(polygon.getA());
             Point2D b = isometricTransformer.transform(polygon.getB());
@@ -74,13 +85,15 @@ public class WireframeDrawing implements Drawing {
             Vector normal = Utils.getNormal(polygon);
             double angle = normal.angle(cameraVector);
 
-            System.out.println(angle);
+//            System.out.println(angle);
             if (angle < 90) {
 //                double lightAngle = normal.angle(lightVector);
 //                int v = 100 + (int) ((90 - lightAngle) / 90 * 100);
-                double lambert = Math.max(normal.dot(lightVector) + factor, 0);
-                int v = (int) (lambert * 200 / (1+factor));
-                graphics.drawPolygon(new Polygon<>(a,b,c), new Color(v,0,0), lineColor);
+
+                double lambert = Math.max(normal.dot(lightVector) + factor, 0) / (1+factor);
+
+                Polygon<Point2D> polygon2D = new Polygon<>(a, b, c, polygon.getvIndex(), polygon.gethIndex(), polygon.getvTotal(), polygon.gethTotal(), polygon.isTop());
+                graphics.drawPolygon(polygon2D, lambert, image, lineColor);
 //                graphics.line(a, b);
 //                graphics.line(a, c);
 //                graphics.line(b, c);

@@ -4,6 +4,7 @@ import me.gumennyi.lab2.types.Point2D;
 import me.gumennyi.lab2.types.Polygon;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 public class CenteredGraphics implements Graphics {
@@ -24,8 +25,18 @@ public class CenteredGraphics implements Graphics {
 
 
     @Override
-    public void drawPolygon(Polygon<Point2D> polygon, Color color, Color lineColor) {
-        graphics.drawPolygon(new Polygon<>(toCentered(polygon.getA()), toCentered(polygon.getB()), toCentered(polygon.getC())), color, lineColor);
+    public void drawPolygon(Polygon<Point2D> polygon, double lambert, BufferedImage image, Color lineColor) {
+
+        Polygon<Point2D> tPolygon = new Polygon<>(
+                toCentered(polygon.getA()),
+                toCentered(polygon.getB()),
+                toCentered(polygon.getC()),
+                polygon.getvIndex(),
+                polygon.gethIndex(),
+                polygon.getvTotal(),
+                polygon.gethTotal(),
+                polygon.isTop());
+        graphics.drawPolygon(tPolygon, lambert, image, lineColor);
     }
 
     @Override
