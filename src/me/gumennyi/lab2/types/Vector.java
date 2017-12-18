@@ -13,7 +13,7 @@ public class Vector {
         z = b.z - a.z;
     }
 
-    private Vector(double x, double y, double z) {
+    public Vector(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -43,7 +43,15 @@ public class Vector {
         return new Vector(x / val, y / val, z / val);
     }
 
+    public Vector add(Vector v) {
+        return new Vector(v.x + x, v.y + y, v.z + z);
+    }
+
     public double length() {
         return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    public Vector substract(Vector v) {
+        return new Vector(-v.x + x, -v.y + y, -v.z + z);
     }
 }

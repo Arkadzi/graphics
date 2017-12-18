@@ -25,7 +25,7 @@ public class BezierPanel implements GraphicPanels {
     private int thetaAngle = -260;
     private int lightShiftFi = 0;
     private int lightShiftTheta = 0;
-    private int edges = 100;
+    private int edges = 1000;
     private int scale = 30;
     private boolean showNormals;
     private String bezierPoints = "-5,0;-4.9,1;-4.3,2.5;-4,3;-3,4;-2.5,4.3;-1,4.9;0,5;1,4.9;2.5,4.3;3,4;4,3;4.3,2.5;4.9,1;5,0";
@@ -86,13 +86,13 @@ public class BezierPanel implements GraphicPanels {
                         }
                         break;
                     case 100:
-                        if (edges > 2) {
-                            edges -= 2;
+                        if (edges > 10) {
+                            edges -= 10;
                             repaint();
                         }
                         break;
                     case 102:
-                        edges += 2;
+                        edges += 10;
                         repaint();
                         break;
                     case 78:

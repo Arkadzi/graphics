@@ -27,8 +27,8 @@ public class DefaultGraphics implements me.gumennyi.lab2.graphics.Graphics {
     }
 
     @Override
-    public void drawPolygon(Polygon<Point2D> polygon, double lambert, BufferedImage image, Color lineColor) {
-        int r = (int) (200 * lambert);
+    public void drawPolygon(Polygon<Point2D> polygon, double lambert, double specCoef, BufferedImage image, Color lineColor) {
+//        int r = (int) (200 * lambert);
 //        graphics.setColor(new Color(polygon.isTop() ? r : 0, polygon.isTop() ? 0 : r, 0));
 
         SimpleMatrix polygonMatrix = getPolygonMatrix(polygon);
@@ -38,24 +38,34 @@ public class DefaultGraphics implements me.gumennyi.lab2.graphics.Graphics {
         for (int x = (int) Utils.minX(polygon); x < Utils.maxX(polygon); x++) {
             for (int y = (int) Utils.minY(polygon); y < Utils.maxY(polygon); y++) {
                 if (Utils.containsPoint(polygon, x, y)) {
-                    SimpleMatrix rasterCoords = new SimpleMatrix(new double[][]{{x}, {y}, {1}});
-                    SimpleMatrix result = transformMatrix.mult(rasterCoords);
-                    int x1 = (int) result.get(0, 0);
-                    int y1 = (int) result.get(1, 0);
-                    try {
-                        System.out.println(x1 + " d " + y1);
-                        int rgb = image.getRGB(x1, y1);
-                        Color c = new Color(rgb);
-                        c = new Color((int) (c.getRed() * lambert), (int) (c.getGreen() * lambert), (int) (c.getBlue() *lambert));
+//                    SimpleMatrix rasterCoords = new SimpleMatrix(new double[][]{{x}, {y}, {1}});
+//                    SimpleMatrix result = transformMatrix.mult(rasterCoords);
+//                    int x1 = (int) result.get(0, 0);
+//                    int y1 = (int) result.get(1, 0);
+//                    try {
+////                        System.out.println(x1 + " d " + y1);
+//                        int rgb = image.getRGB(x1, y1);
+//                        Color c = new Color(rgb);
+                        Color c = new Color(128, 0, 0);
+
+                        int r = getR((int) (c.getRed() * lambert + specCoef * 255 * 0.7));
+                        int g = getR((int) (c.getGreen() * lambert + specCoef * 255 * 0.7));
+                        int b = getR((int) (c.getBlue() * lambert + specCoef * 0));
+                        c = new Color(r, g, b);
                         graphics.setColor(c);
                         graphics.drawRect(x, y, 1, 1);
-                    } catch (Exception e) {
-                        System.out.println(x1 + " " + y1);
-                    }
+//                    } catch (Exception e) {
+//                        System.out.println(x1 + " " + y1);
+//                    }
 
                 }
             }
         }
+    }
+
+    private int getR(int r) {
+        if (r > 255) r = 255;
+        return r;
     }
 
     private Polygon<Point2D> getRasterPolygon(Polygon<Point2D> polygon, BufferedImage image) {

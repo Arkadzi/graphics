@@ -91,9 +91,20 @@ public class WireframeDrawing implements Drawing {
 //                int v = 100 + (int) ((90 - lightAngle) / 90 * 100);
 
                 double lambert = Math.max(normal.dot(lightVector) + factor, 0) / (1+factor);
+                Vector v = cameraVector.divide(cameraVector.length());
+                Vector l = lightVector.divide(lightVector.length());
+                Vector r = normal.divide(0.5).divide(1 / normal.dot(v)).substract(v);
+//                Vector h = l.add(v);
+//                h = h.divide(h.length());
+//                lambert =  Math.pow(Math.max(l.dot(r), 0), 1);
+
+                double diffCoef = Math.max(normal.dot(l), 0);
+                double specCoef = Math.pow(Math.max(l.dot(r), 0), 10);
+
 
                 Polygon<Point2D> polygon2D = new Polygon<>(a, b, c, polygon.getvIndex(), polygon.gethIndex(), polygon.getvTotal(), polygon.gethTotal(), polygon.isTop());
-                graphics.drawPolygon(polygon2D, lambert, image, lineColor);
+//                graphics.drawPolygon(polygon2D, lambert, image, lineColor);
+                graphics.drawPolygon(polygon2D, diffCoef, specCoef, image, lineColor);
 //                graphics.line(a, b);
 //                graphics.line(a, c);
 //                graphics.line(b, c);
