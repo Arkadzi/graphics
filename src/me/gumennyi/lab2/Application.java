@@ -3,6 +3,7 @@ package me.gumennyi.lab2;
 import me.gumennyi.lab2.panels.BezierPanel;
 import me.gumennyi.lab2.panels.ParabolCylinderPanel;
 import me.gumennyi.lab2.panels.GraphicPanels;
+import me.gumennyi.lab2.types.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 import javax.swing.*;

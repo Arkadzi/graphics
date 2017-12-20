@@ -27,7 +27,7 @@ public class DefaultGraphics implements me.gumennyi.lab2.graphics.Graphics {
     }
 
     @Override
-    public void drawPolygon(Polygon<Point2D> polygon, double lambert, double specCoef, BufferedImage image, Color lineColor) {
+    public void drawPolygon(Polygon<Point2D> polygon, double lambert, double specCoef, BufferedImage image, Color pixelColor) {
 //        int r = (int) (200 * lambert);
 //        graphics.setColor(new Color(polygon.isTop() ? r : 0, polygon.isTop() ? 0 : r, 0));
 
@@ -46,7 +46,7 @@ public class DefaultGraphics implements me.gumennyi.lab2.graphics.Graphics {
 ////                        System.out.println(x1 + " d " + y1);
 //                        int rgb = image.getRGB(x1, y1);
 //                        Color c = new Color(rgb);
-                        Color c = new Color(128, 0, 0);
+                        Color c = pixelColor;
 
                         int r = getR((int) (c.getRed() * lambert + specCoef * 255 * 0.7));
                         int g = getR((int) (c.getGreen() * lambert + specCoef * 255 * 0.7));

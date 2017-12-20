@@ -25,13 +25,14 @@ public class BezierPanel implements GraphicPanels {
     private int thetaAngle = -260;
     private int lightShiftFi = 0;
     private int lightShiftTheta = 0;
-    private int edges = 1000;
+    private int edges = 20;
     private int scale = 30;
     private boolean showNormals;
-    private String bezierPoints = "-5,0;-4.9,1;-4.3,2.5;-4,3;-3,4;-2.5,4.3;-1,4.9;0,5;1,4.9;2.5,4.3;3,4;4,3;4.3,2.5;4.9,1;5,0";
+    private String bezierPoints = "-5,3;0,6;5,2";
     private List<Point2D> sourcePoints;
     private Color lineColor;
     private double factor;
+    private BezierPoints pointsGenerator;
 
     public BezierPanel() {
         parseBezierPoints();
@@ -189,9 +190,12 @@ public class BezierPanel implements GraphicPanels {
     }
 
     private Function<me.gumennyi.lab2.graphics.Graphics, Drawing> newFunction() {
-        return graphics -> new WireframeDrawing(graphics,
-                new BezierPoints(sourcePoints, scale, scale, edges, edges),
-                fiAngle, thetaAngle, showNormals, true, false, lineColor, lightShiftFi, lightShiftTheta, factor);
+        pointsGenerator = new BezierPoints(sourcePoints, scale, scale, edges, edges);
+        return graphics -> {
+            return new WireframeDrawing(graphics,
+                    pointsGenerator,
+                    fiAngle, thetaAngle, showNormals, true, false, lineColor, lightShiftFi, lightShiftTheta, factor);
+        };
     }
 
     private Function<Graphics, Drawing> newFlatBezierFunction() {

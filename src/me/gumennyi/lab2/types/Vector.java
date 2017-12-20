@@ -39,8 +39,22 @@ public class Vector {
         return productVector.divide(productVector.length());
     }
 
+
+    @Override
+    public String toString() {
+        return "Vector{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
+
     public Vector divide(double val) {
         return new Vector(x / val, y / val, z / val);
+    }
+
+    public Vector mul(double val) {
+        return new Vector(x * val, y * val, z * val);
     }
 
     public Vector add(Vector v) {

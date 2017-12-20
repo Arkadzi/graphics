@@ -4,6 +4,7 @@ import me.gumennyi.lab2.types.Point2D;
 import me.gumennyi.lab2.types.Point3D;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.DoubleStream;
 
 public class BezierPoints implements PointsGenerator {
@@ -12,6 +13,9 @@ public class BezierPoints implements PointsGenerator {
     private final int hParts;
     private final int vParts;
     private final BezierFunction bezierFunction;
+    private final Random random = new Random();
+    private Point3D[][] point3DS;
+
 
     public BezierPoints(List<Point2D> sourcePoints, int r, int h, int hParts, int vParts) {
         this.r = r;
@@ -27,11 +31,14 @@ public class BezierPoints implements PointsGenerator {
 
     @Override
     public Point3D[][] generatePoints() {
-        double step = 1. / vParts;
+        if (point3DS == null) {
+            double step = 1. / vParts;
 
-        return DoubleStream.iterate(0, (v) -> v <= 1, (v) -> v + step)
-                           .mapToObj(this::generatePointsLayer)
-                           .toArray(Point3D[][]::new);
+            point3DS = DoubleStream.iterate(0, (v) -> v <= 1, (v) -> v + step)
+                    .mapToObj(this::generatePointsLayer)
+                    .toArray(Point3D[][]::new);
+        }
+        return point3DS;
     }
 
     private double getRad(double u) {
@@ -48,7 +55,13 @@ public class BezierPoints implements PointsGenerator {
     }
 
     private Point3D getPoint(double u, double v, Point2D point2D) {
-        return new Point3D(r * Math.cos(getRad(u)) * point2D.y, r * Math.sin(getRad(u)) * point2D.y, h * point2D.x);
+        double x = r * Math.cos(getRad(u)) * point2D.y;
+//        x += (random.nextDouble() / 10 * x * 2) - (random.nextDouble() / 10 * x * 2);
+        double y = r * Math.sin(getRad(u)) * point2D.y;
+//        y += (random.nextDouble() / 10 * y * 2) - (random.nextDouble() / 10 * y * 2);
+        double z = h * point2D.x;
+//        z += (random.nextDouble() / 10 * h * 2) - (random.nextDouble() / 10 * h * 2);
+        return new Point3D(x, y, z);
     }
 
 

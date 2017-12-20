@@ -25,7 +25,7 @@ public class CenteredGraphics implements Graphics {
 
 
     @Override
-    public void drawPolygon(Polygon<Point2D> polygon, double lambert, double specCoef, BufferedImage image, Color lineColor) {
+    public void drawPolygon(Polygon<Point2D> polygon, double lambert, double specCoef, BufferedImage image, Color pixelColor) {
 
         Polygon<Point2D> tPolygon = new Polygon<>(
                 toCentered(polygon.getA()),
@@ -36,7 +36,7 @@ public class CenteredGraphics implements Graphics {
                 polygon.getvTotal(),
                 polygon.gethTotal(),
                 polygon.isTop());
-        graphics.drawPolygon(tPolygon, lambert, specCoef, image, lineColor);
+        graphics.drawPolygon(tPolygon, lambert, specCoef, image, pixelColor);
     }
 
     @Override

@@ -47,6 +47,7 @@ public class WireframeDrawing implements Drawing {
         cameraVector = getCameraPoint(fiAngle, thetaAngle);
         lightVector = getCameraPoint(fiAngle - lightShiftFi, thetaAngle - lightShiftTheta);
 
+
 //        System.out.println(fiAngle + " " + thetaAngle + " " + cameraVector);
         this.showNormal = showNormal;
     }
@@ -55,15 +56,18 @@ public class WireframeDrawing implements Drawing {
     private Vector getCameraPoint(int fiAngle, int thetaAngle) {
         int s = 1;
         double fiDeg = Utils.degToRad(fiAngle);
-        double thetaDeg = Utils.degToRad(thetaAngle);
-        double x = s * Math.sin(fiDeg);
-        double y = s * Math.cos(fiDeg);
+        double thetaDeg = Utils.degToRad(180 - thetaAngle % 180);
+        double x = s * Math.sin(fiDeg) * Math.sin(thetaDeg);
+        double y = s * Math.cos(fiDeg) * Math.sin(thetaDeg);
         Point3D point3D = new Point3D(
-                x * Math.sin(thetaDeg),
-                y * Math.sin(thetaDeg),
-                -s * Math.cos(thetaDeg)
+                x,
+                y,
+                s * Math.cos(thetaDeg)
         );
-        return new Vector(new Point3D(0,0,0), point3D);
+
+        Vector vector = new Vector(new Point3D(0, 0, 0), point3D);
+//        System.out.println(vector);
+        return vector;
     }
 
 
@@ -76,7 +80,16 @@ public class WireframeDrawing implements Drawing {
     private void drawFigure(PointsGenerator pointsGenerator, boolean reverse) {
         Point3D[][] cylinderPoints = pointsGenerator.generatePoints();
         Polygon<Point3D>[] convert = Utils.convert(cylinderPoints, reverse);
-     //   System.out.println(convert[0].getvTotal() + " " + convert[0].gethTotal());
+        //   System.out.println(convert[0].getvTotal() + " " + convert[0].gethTotal());
+        Vector v = cameraVector;
+
+        Vector l = lightVector.divide(lightVector.length());
+        System.out.println(lightVector);
+        Point3D orig = new Point3D(-200 * lightVector.x, -200 * lightVector.y, -200 * lightVector.z);
+        Point3D destination = new Point3D(0, 0, 0);
+        Vector vector = new Vector(orig, destination);
+        vector = vector.divide(vector.length());
+        Point3D intersect = null;
         for (Polygon<Point3D> polygon : convert) {
             Point2D a = isometricTransformer.transform(polygon.getA());
             Point2D b = isometricTransformer.transform(polygon.getB());
@@ -90,9 +103,7 @@ public class WireframeDrawing implements Drawing {
 //                double lightAngle = normal.angle(lightVector);
 //                int v = 100 + (int) ((90 - lightAngle) / 90 * 100);
 
-                double lambert = Math.max(normal.dot(lightVector) + factor, 0) / (1+factor);
-                Vector v = cameraVector.divide(cameraVector.length());
-                Vector l = lightVector.divide(lightVector.length());
+                double lambert = Math.max(normal.dot(lightVector) + factor, 0) / (1 + factor);
                 Vector r = normal.divide(0.5).divide(1 / normal.dot(v)).substract(v);
 //                Vector h = l.add(v);
 //                h = h.divide(h.length());
@@ -104,7 +115,16 @@ public class WireframeDrawing implements Drawing {
 
                 Polygon<Point2D> polygon2D = new Polygon<>(a, b, c, polygon.getvIndex(), polygon.gethIndex(), polygon.getvTotal(), polygon.gethTotal(), polygon.isTop());
 //                graphics.drawPolygon(polygon2D, lambert, image, lineColor);
-                graphics.drawPolygon(polygon2D, diffCoef, specCoef, image, lineColor);
+
+//                Vector direction = new Vector(-orig.x, -orig.y, -orig.z);
+                Point3D intersect1 = Utils.intersect(orig, vector, polygon);
+                if (intersect == null) {
+                    intersect = intersect1;
+                }
+
+//                if (intersect1 != null) {
+                graphics.drawPolygon(polygon2D, diffCoef, specCoef, image, intersect1 != null ? Color.blue : Color.red);
+//                }
 //                graphics.line(a, b);
 //                graphics.line(a, c);
 //                graphics.line(b, c);
@@ -112,6 +132,9 @@ public class WireframeDrawing implements Drawing {
                     drawNormal(polygon);
                 }
             }
+//            if (intersect != null) {
+                graphics.line(isometricTransformer.transform(destination), isometricTransformer.transform(orig), Color.magenta);
+//            }
         }
     }
 
@@ -173,7 +196,6 @@ public class WireframeDrawing implements Drawing {
 //        graphics.line(x8, x5, red);
 
         graphics.line(isometricTransformer.transform(new Point3D(cameraVector.x, cameraVector.y, cameraVector.z)), Color.green);
-        graphics.line(isometricTransformer.transform(new Point3D(lightVector.x, lightVector.y, lightVector.z)), Color.magenta);
 
 //        graphics.line(isometricTransformer.transform(x2), red);
 //        graphics.line(isometricTransformer.transform(x3), red);
