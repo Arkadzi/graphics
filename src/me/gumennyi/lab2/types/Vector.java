@@ -27,7 +27,7 @@ public class Vector {
 
     public double angle(Vector vector) {
         double v = dot(vector);
-        return Utils.radToDeg(Math.acos(v / length() / vector.length()));
+        return Math.toDegrees(Math.acos(v / length() / vector.length()));
     }
 
     public double dot(Vector vector) {

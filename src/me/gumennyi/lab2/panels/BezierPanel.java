@@ -194,7 +194,7 @@ public class BezierPanel implements GraphicPanels {
         return graphics -> {
             return new WireframeDrawing(graphics,
                     pointsGenerator,
-                    fiAngle, thetaAngle, showNormals, true, false, lineColor, lightShiftFi, lightShiftTheta, factor);
+                    fiAngle, thetaAngle, showNormals, true, true, lineColor, lightShiftFi, lightShiftTheta, factor);
         };
     }
 

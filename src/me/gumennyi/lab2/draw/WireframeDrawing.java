@@ -4,6 +4,7 @@ import me.gumennyi.lab2.generator.PointsGenerator;
 import me.gumennyi.lab2.graphics.Graphics;
 import me.gumennyi.lab2.graphics.IsometricTransformer;
 import me.gumennyi.lab2.graphics.Utils;
+import me.gumennyi.lab2.types.Point;
 import me.gumennyi.lab2.types.Point2D;
 import me.gumennyi.lab2.types.Point3D;
 import me.gumennyi.lab2.types.Polygon;
@@ -88,17 +89,19 @@ public class WireframeDrawing implements Drawing {
         Vector vector = new Vector(orig, destination);
         vector = vector.divide(vector.length());
         Point3D intersect = null;
+        Polygon<Point3D> intersectPolygon = null;
         for (Polygon<Point3D> polygon : convert) {
             Point2D a = isometricTransformer.transform(polygon.getA());
             Point2D b = isometricTransformer.transform(polygon.getB());
             Point2D c = isometricTransformer.transform(polygon.getC());
 
             Vector normal = Utils.getNormal(polygon);
-            double angle = normal.angle(cameraVector);
+            double angle = normal.mul(-1).angle(cameraVector);
 
             if (angle < 90) {
                 double lambert = Math.max(normal.dot(lightVector) + factor, 0) / (1 + factor);
-                Vector r = normal.divide(0.5).divide(1 / normal.dot(v)).substract(v);
+                normal = normal.mul(-1);
+                Vector r = normal.mul(2).mul(normal.dot(v)).substract(v);
 
                 double diffCoef = Math.max(normal.dot(l), 0);
                 double specCoef = Math.pow(Math.max(l.dot(r), 0), 10);
@@ -114,6 +117,7 @@ public class WireframeDrawing implements Drawing {
                     }
                     if (intersect == null) {
                         intersect = intersect1;
+                        intersectPolygon = polygon;
                     }
                 }
 
@@ -126,13 +130,21 @@ public class WireframeDrawing implements Drawing {
         if (intersect != null) {
             System.out.println("intersects in " + intersect);
             graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(orig), Color.white);
+            Vector normal = Utils.getNormal(intersectPolygon);
+            Vector newDir = vector.substract(normal.mul(2).mul(vector.dot(normal)));
+            Point3D point = new Point3D(intersect.x + newDir.x * 100, intersect.y + newDir.y * 100, intersect.z + newDir.z * 100);
+            Point3D normal1 = new Point3D(intersect.x + normal.x * 100, intersect.y + normal.y * 100, intersect.z + normal.z * 100);
+            graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(point), Color.white);
+            graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(normal1), Color.red);
+
         }
     }
 
     private void drawNormal(Polygon<Point3D> polygon) {
         Vector n = Utils.getNormal(polygon);
         Point3D center = findCenter(polygon.getA(), polygon.getB(), polygon.getC());
-        Point3D vp = new Point3D(center.x - n.x * NORMAL_LENGTH, center.y - n.y * NORMAL_LENGTH, center.z - n.z * NORMAL_LENGTH);
+        Point3D vp = new Point3D(center.x + n.x * NORMAL_LENGTH, center.y + n.y * NORMAL_LENGTH, center.z + n.z * NORMAL_LENGTH);
+
         graphics.line(isometricTransformer.transform(center), isometricTransformer.transform(vp), Color.green);
     }
 
