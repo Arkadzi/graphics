@@ -138,7 +138,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private Function<Graphics, Drawing> newCylinderFunction() {
         return graphics -> new WireframeDrawing(graphics,
                                                 new ParabolCylinderPoints(scale, scale, edges, edges), fiAngle,
-                                                thetaAngle, showNormals, false, true, lineColor, lightShiftFi, lightShiftTheta, factor);
+                                                thetaAngle, showNormals, false, false, lineColor, lightShiftFi, lightShiftTheta, factor);
     }
 
 }

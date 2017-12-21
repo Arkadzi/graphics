@@ -56,11 +56,11 @@ public class BezierPoints implements PointsGenerator {
 
     private Point3D getPoint(double u, double v, Point2D point2D) {
         double x = r * Math.cos(getRad(u)) * point2D.y;
-//        x += (random.nextDouble() / 10 * x * 2) - (random.nextDouble() / 10 * x * 2);
+        x += (random.nextDouble() / 10 * x * 2) - (random.nextDouble() / 10 * x * 2);
         double y = r * Math.sin(getRad(u)) * point2D.y;
-//        y += (random.nextDouble() / 10 * y * 2) - (random.nextDouble() / 10 * y * 2);
+        y += (random.nextDouble() / 10 * y * 2) - (random.nextDouble() / 10 * y * 2);
         double z = h * point2D.x;
-//        z += (random.nextDouble() / 10 * h * 2) - (random.nextDouble() / 10 * h * 2);
+        z += (random.nextDouble() / 10 * h * 2) - (random.nextDouble() / 10 * h * 2);
         return new Point3D(x, y, z);
     }
 

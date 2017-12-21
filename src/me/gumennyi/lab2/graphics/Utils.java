@@ -14,11 +14,11 @@ public class Utils {
         return rad * 180 / Math.PI;
     }
 
-    public static <T extends Point> Polygon<T>[] convert(T[][] cylinderPoints, boolean reverse) {
+    public static <T extends Point> Polygon<T>[] convert(T[][] cylinderPoints, boolean reverse, boolean isContinuous) {
 
         List<Polygon> polygons = new ArrayList<>();
         for (int i = 0; i < cylinderPoints.length - 1; i++) {
-            for (int j = 0; j < cylinderPoints[i].length; j++) {
+            for (int j = 0; j < cylinderPoints[i].length - 1; j++) {
                 int jMax = cylinderPoints[i].length;
                 T point1 = cylinderPoints[i][j];
                 T point2 = cylinderPoints[i + 1][j];

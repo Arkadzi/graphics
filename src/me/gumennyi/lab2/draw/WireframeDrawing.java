@@ -79,13 +79,11 @@ public class WireframeDrawing implements Drawing {
 
     private void drawFigure(PointsGenerator pointsGenerator, boolean reverse) {
         Point3D[][] cylinderPoints = pointsGenerator.generatePoints();
-        Polygon<Point3D>[] convert = Utils.convert(cylinderPoints, reverse);
-        //   System.out.println(convert[0].getvTotal() + " " + convert[0].gethTotal());
+        Polygon<Point3D>[] convert = Utils.convert(cylinderPoints, reverse, isContinuous);
         Vector v = cameraVector;
 
         Vector l = lightVector.divide(lightVector.length());
-        System.out.println(lightVector);
-        Point3D orig = new Point3D(-200 * lightVector.x, -200 * lightVector.y, -200 * lightVector.z);
+        Point3D orig = new Point3D(-500 * lightVector.x, -500 * lightVector.y, -500 * lightVector.z);
         Point3D destination = new Point3D(0, 0, 0);
         Vector vector = new Vector(orig, destination);
         vector = vector.divide(vector.length());
@@ -98,43 +96,36 @@ public class WireframeDrawing implements Drawing {
             Vector normal = Utils.getNormal(polygon);
             double angle = normal.angle(cameraVector);
 
-//            System.out.println(angle);
             if (angle < 90) {
-//                double lightAngle = normal.angle(lightVector);
-//                int v = 100 + (int) ((90 - lightAngle) / 90 * 100);
-
                 double lambert = Math.max(normal.dot(lightVector) + factor, 0) / (1 + factor);
                 Vector r = normal.divide(0.5).divide(1 / normal.dot(v)).substract(v);
-//                Vector h = l.add(v);
-//                h = h.divide(h.length());
-//                lambert =  Math.pow(Math.max(l.dot(r), 0), 1);
 
                 double diffCoef = Math.max(normal.dot(l), 0);
                 double specCoef = Math.pow(Math.max(l.dot(r), 0), 10);
 
 
                 Polygon<Point2D> polygon2D = new Polygon<>(a, b, c, polygon.getvIndex(), polygon.gethIndex(), polygon.getvTotal(), polygon.gethTotal(), polygon.isTop());
-//                graphics.drawPolygon(polygon2D, lambert, image, lineColor);
 
-//                Vector direction = new Vector(-orig.x, -orig.y, -orig.z);
-                Point3D intersect1 = Utils.intersect(orig, vector, polygon);
-                if (intersect == null) {
-                    intersect = intersect1;
+                Point3D intersect1 = null;
+                if (normal.angle(vector) < 90) {
+                    intersect1 = Utils.intersect(orig, vector, polygon);
+                    if (intersect1 != null) {
+                        System.out.println(intersect1);
+                    }
+                    if (intersect == null) {
+                        intersect = intersect1;
+                    }
                 }
 
-//                if (intersect1 != null) {
                 graphics.drawPolygon(polygon2D, diffCoef, specCoef, image, intersect1 != null ? Color.blue : Color.red);
-//                }
-//                graphics.line(a, b);
-//                graphics.line(a, c);
-//                graphics.line(b, c);
                 if (showNormal) {
                     drawNormal(polygon);
                 }
             }
-//            if (intersect != null) {
-                graphics.line(isometricTransformer.transform(destination), isometricTransformer.transform(orig), Color.magenta);
-//            }
+        }
+        if (intersect != null) {
+            System.out.println("intersects in " + intersect);
+            graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(orig), Color.white);
         }
     }
 

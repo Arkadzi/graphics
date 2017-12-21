@@ -19,8 +19,8 @@ public class Application {
 //        System.out.println(v);
 //        SimpleMatrix mult = matrix1.mult(matrix);
 //        System.out.println(mult);
-        bezier();
-//        cylinder();
+//        bezier();
+        cylinder();
     }
 
     private static void cylinder() {

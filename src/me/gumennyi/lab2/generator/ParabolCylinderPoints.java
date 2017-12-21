@@ -43,6 +43,6 @@ public class ParabolCylinderPoints implements PointsGenerator {
     }
 
     private Point3D getPoint(double y, double v) {
-        return new Point3D(r * y * y, r * y, h * v);
+        return new Point3D(r * y * y + r/2, r * y, h * v);
     }
 }
