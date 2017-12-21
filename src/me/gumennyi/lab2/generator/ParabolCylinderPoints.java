@@ -2,6 +2,7 @@ package me.gumennyi.lab2.generator;
 
 import me.gumennyi.lab2.types.Point3D;
 
+import java.util.Random;
 import java.util.stream.DoubleStream;
 
 public class ParabolCylinderPoints implements PointsGenerator {
@@ -10,6 +11,7 @@ public class ParabolCylinderPoints implements PointsGenerator {
     private final int h;
     private final int hParts;
     private final int vParts;
+    private Random random = new Random();
 
     public ParabolCylinderPoints(int r, int h, int hParts, int vParts) {
         this.r = r;
@@ -43,6 +45,10 @@ public class ParabolCylinderPoints implements PointsGenerator {
     }
 
     private Point3D getPoint(double y, double v) {
-        return new Point3D(r * y * y + r/2, r * y, h * v);
+        double x = r * y * y + r / 2;
+        double y1 = r * y;
+        x += (random.nextDouble() / 10 * x * 2) - (random.nextDouble() / 10 * x * 2);
+        y1 += (random.nextDouble() / 10 * y1 * 2) - (random.nextDouble() / 10 * y1 * 2);
+        return new Point3D(x, y1, h * v);
     }
 }

@@ -43,6 +43,25 @@ public class Polygon<T extends Point> {
         return c;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Polygon<?> polygon = (Polygon<?>) o;
+
+        if (vIndex != polygon.vIndex) return false;
+        if (hIndex != polygon.hIndex) return false;
+        return top == polygon.top;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = vIndex;
+        result = 31 * result + hIndex;
+        result = 31 * result + (top ? 1 : 0);
+        return result;
+    }
 
     public int getvIndex() {
         return vIndex;

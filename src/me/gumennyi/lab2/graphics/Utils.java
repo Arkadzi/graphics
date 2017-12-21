@@ -38,6 +38,12 @@ public class Utils {
         return polygons.toArray(new Polygon[polygons.size()]);
     }
 
+
+    public static Vector getReflectedVector(Vector normal, Vector origin) {
+        Vector reflected = origin.substract(normal.mul(2).mul(origin.dot(normal)));
+        return reflected.divide(reflected.length());
+    }
+
     public static Vector getNormal(Polygon<Point3D> polygon) {
         Vector v1 = new Vector(polygon.getA(), polygon.getB());
         Vector v2 = new Vector(polygon.getA(), polygon.getC());

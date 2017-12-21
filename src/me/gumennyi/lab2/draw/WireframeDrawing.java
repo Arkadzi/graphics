@@ -4,17 +4,15 @@ import me.gumennyi.lab2.generator.PointsGenerator;
 import me.gumennyi.lab2.graphics.Graphics;
 import me.gumennyi.lab2.graphics.IsometricTransformer;
 import me.gumennyi.lab2.graphics.Utils;
-import me.gumennyi.lab2.types.Point;
-import me.gumennyi.lab2.types.Point2D;
-import me.gumennyi.lab2.types.Point3D;
+import me.gumennyi.lab2.types.*;
 import me.gumennyi.lab2.types.Polygon;
-import me.gumennyi.lab2.types.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class WireframeDrawing implements Drawing {
 
@@ -88,8 +86,8 @@ public class WireframeDrawing implements Drawing {
         Point3D destination = new Point3D(0, 0, 0);
         Vector vector = new Vector(orig, destination);
         vector = vector.divide(vector.length());
-        Point3D intersect = null;
-        Polygon<Point3D> intersectPolygon = null;
+        java.util.List<Intersection> intersections = calculateIntersections(orig, vector, convert);
+        System.out.println(intersections.size());
         for (Polygon<Point3D> polygon : convert) {
             Point2D a = isometricTransformer.transform(polygon.getA());
             Point2D b = isometricTransformer.transform(polygon.getB());
@@ -109,35 +107,37 @@ public class WireframeDrawing implements Drawing {
 
                 Polygon<Point2D> polygon2D = new Polygon<>(a, b, c, polygon.getvIndex(), polygon.gethIndex(), polygon.getvTotal(), polygon.gethTotal(), polygon.isTop());
 
-                Point3D intersect1 = null;
-                if (normal.angle(vector) < 90) {
-                    intersect1 = Utils.intersect(orig, vector, polygon);
-                    if (intersect1 != null) {
-                        System.out.println(intersect1);
-                    }
-                    if (intersect == null) {
-                        intersect = intersect1;
-                        intersectPolygon = polygon;
-                    }
-                }
-
-                graphics.drawPolygon(polygon2D, diffCoef, specCoef, image, intersect1 != null ? Color.blue : Color.red);
+                graphics.drawPolygon(polygon2D, diffCoef, specCoef, image, contains(intersections, polygon) ? Color.blue : Color.red);
                 if (showNormal) {
                     drawNormal(polygon);
                 }
             }
         }
-        if (intersect != null) {
-            System.out.println("intersects in " + intersect);
-            graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(orig), Color.white);
-            Vector normal = Utils.getNormal(intersectPolygon);
-            Vector newDir = vector.substract(normal.mul(2).mul(vector.dot(normal)));
-            Point3D point = new Point3D(intersect.x + newDir.x * 100, intersect.y + newDir.y * 100, intersect.z + newDir.z * 100);
-            Point3D normal1 = new Point3D(intersect.x + normal.x * 100, intersect.y + normal.y * 100, intersect.z + normal.z * 100);
-            graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(point), Color.white);
-            graphics.line(isometricTransformer.transform(intersect), isometricTransformer.transform(normal1), Color.red);
+        for (Intersection intersection : intersections) {
+            Point3D intersectionPoint = intersection.getIntersectionPoint();
+            Point3D origin = intersection.getOrigin();
+            Point2D destinationPoint;
+            if (intersectionPoint != null) {
+                Vector n = Utils.getNormal(intersection.getPolygon());
+                destinationPoint = isometricTransformer.transform(intersectionPoint);
+                Point3D normalTo = destinationPoint(intersectionPoint, n, NORMAL_LENGTH);
+                Point2D normalTo2D = isometricTransformer.transform(normalTo);
+                graphics.line(destinationPoint, normalTo2D, Color.green);
+            } else {
+                Point3D point3D = destinationPoint(origin, intersection.getDirection(), NORMAL_LENGTH * 3);
+                destinationPoint = isometricTransformer.transform(point3D);
+            }
+            Point2D origin2D = isometricTransformer.transform(origin);
+            graphics.line(origin2D, destinationPoint, Color.white);
 
         }
+    }
+
+    private Point3D destinationPoint(Point3D intersectionPoint, Vector direction, int length) {
+        direction = direction.divide(direction.length());
+        return new Point3D(intersectionPoint.x + direction.x * length,
+                intersectionPoint.y + direction.y * length,
+                intersectionPoint.z + direction.z * length);
     }
 
     private void drawNormal(Polygon<Point3D> polygon) {
@@ -211,5 +211,38 @@ public class WireframeDrawing implements Drawing {
 //        graphics.line(isometricTransformer.transform(cameraVector), Color.red);
 //        graphics.line(isometricTransformer.transform(new Point3D(normal.x * 100, normal.y * 100, normal.z * 100)));
 
+    }
+
+    public java.util.List<Intersection> calculateIntersections(Point3D orig, Vector origDir, Polygon<Point3D>[] polygons) {
+        java.util.List<Intersection> intersections = new ArrayList<>();
+        Intersection intersection = null;
+        do {
+            intersection = new Intersection(orig, origDir);
+            for (Polygon<Point3D> polygon : polygons) {
+                Vector normal = Utils.getNormal(polygon);
+                if (normal.mul(-1).angle(intersection.getDirection()) < 90) {
+                    Point3D intersectionPoint = Utils.intersect(orig, intersection.getDirection(), polygon);
+                    if (intersectionPoint != null) {
+                        intersection.setIntersection(polygon, intersectionPoint);
+                    }
+                }
+            }
+            if (intersection.getIntersectionPoint() != null) {
+                Vector normal = Utils.getNormal(intersection.getPolygon());
+                origDir = Utils.getReflectedVector(normal, intersection.getDirection());
+                orig = intersection.getIntersectionPoint();
+            }
+            intersections.add(intersection);
+        } while (intersection.getIntersectionPoint() != null);
+        return intersections;
+    }
+
+    public boolean contains(java.util.List<Intersection> intersections, Polygon<Point3D> polygon) {
+        for (Intersection intersection : intersections) {
+            if (polygon.equals(intersection.getPolygon())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
