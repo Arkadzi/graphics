@@ -10,12 +10,14 @@ public class ParabolCylinderPoints implements PointsGenerator {
     public static final int DISTORTION_COEF = 20;
     private final int hParts;
     private final int vParts;
+    private boolean randomize;
     private Random random = new Random();
     private Point3D[][] point3DS;
 
-    public ParabolCylinderPoints(int grid) {
+    public ParabolCylinderPoints(int grid, boolean randomize) {
         this.hParts = grid;
         this.vParts = grid;
+        this.randomize = randomize;
         double step = 1./vParts;
         point3DS = DoubleStream.iterate(-1, (v) -> v <= 1, (v) -> v + step)
                 .mapToObj(this::generatePointsLayer)
@@ -44,8 +46,10 @@ public class ParabolCylinderPoints implements PointsGenerator {
 
     private Point3D getPoint(double y, double v) {
         double x = y * y + 0.5;
-        x += (random.nextDouble() / DISTORTION_COEF * x * 2) - (random.nextDouble() / DISTORTION_COEF * x * 2);
-        y += (random.nextDouble() / DISTORTION_COEF * y * 2) - (random.nextDouble() / DISTORTION_COEF * y * 2);
+        if (randomize) {
+            x += (random.nextDouble() / DISTORTION_COEF * x * 2) - (random.nextDouble() / DISTORTION_COEF * x * 2);
+            y += (random.nextDouble() / DISTORTION_COEF * y * 2) - (random.nextDouble() / DISTORTION_COEF * y * 2);
+        }
         return new Point3D(x, y, v);
     }
 }

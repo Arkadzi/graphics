@@ -24,6 +24,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private int lightShiftFi = 0;
     private int lightShiftTheta = 0;
     private double factor;
+    private boolean randomize;
     private ParabolCylinderPoints pointsGenerator;
 
 
@@ -50,6 +51,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
 
             @Override
             public void keyPressed(KeyEvent e) {
+                System.out.println(e.getKeyCode());
                 switch (e.getKeyCode()) {
                     case 37:
                         fiAngle += 10;
@@ -91,6 +93,11 @@ public class ParabolCylinderPanel implements GraphicPanels {
                         break;
                     case 78:
                         showNormals = !showNormals;
+                        repaint();
+                        break;
+                    case 82:
+                        randomize = !randomize;
+                        generatePointsGenerator();
                         repaint();
                         break;
                     case 76:
@@ -148,7 +155,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     }
 
     private void generatePointsGenerator() {
-        pointsGenerator = new ParabolCylinderPoints(edges);
+        pointsGenerator = new ParabolCylinderPoints(edges, randomize);
     }
 
 }
