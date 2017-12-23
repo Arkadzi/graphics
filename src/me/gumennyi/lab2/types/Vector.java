@@ -26,8 +26,11 @@ public class Vector {
     }
 
     public double angle(Vector vector) {
-        double v = dot(vector);
-        return Math.toDegrees(Math.acos(v / length() / vector.length()));
+        double v = dot(vector) / length() / vector.length();
+        if (Math.abs(1 - v) < 0.00001) {
+            v = 1;
+        }
+        return Math.toDegrees(Math.acos(v));
     }
 
     public double dot(Vector vector) {

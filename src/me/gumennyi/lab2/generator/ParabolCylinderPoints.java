@@ -7,33 +7,31 @@ import java.util.stream.DoubleStream;
 
 public class ParabolCylinderPoints implements PointsGenerator {
 
-    private final int r;
-    private final int h;
+    public static final int DISTORTION_COEF = 20;
     private final int hParts;
     private final int vParts;
     private Random random = new Random();
+    private Point3D[][] point3DS;
 
-    public ParabolCylinderPoints(int r, int h, int hParts, int vParts) {
-        this.r = r;
-        this.h = h;
-        this.hParts = hParts;
-        this.vParts = vParts;
-    }
-
-    public ParabolCylinderPoints(int r, int h) {
-        this.r = r;
-        this.h = h;
-        vParts = 10;
-        hParts = 100;
+    public ParabolCylinderPoints(int grid) {
+        this.hParts = grid;
+        this.vParts = grid;
+        double step = 1./vParts;
+        point3DS = DoubleStream.iterate(-1, (v) -> v <= 1, (v) -> v + step)
+                .mapToObj(this::generatePointsLayer)
+                .toArray(Point3D[][]::new);
     }
 
     @Override
-    public Point3D[][] generatePoints() {
-        double step = 1. / vParts;
-
-        return DoubleStream.iterate(0, (v) -> v <= 1, (v) -> v + step)
-                .mapToObj(this::generatePointsLayer)
-                .toArray(Point3D[][]::new);
+    public Point3D[][] generatePoints(int scale) {
+        Point3D[][] scaledPoints = new Point3D[this.point3DS.length][this.point3DS[0].length];
+        for (int i = 0; i < point3DS.length; i++) {
+            for (int j = 0; j < point3DS[0].length; j++) {
+                Point3D point3D = point3DS[i][j];
+                scaledPoints[i][j] = new Point3D(point3D.x * scale, point3D.y * scale, point3D.z * scale);
+            }
+        }
+        return scaledPoints;
     }
 
     private Point3D[] generatePointsLayer(double v) {
@@ -45,10 +43,9 @@ public class ParabolCylinderPoints implements PointsGenerator {
     }
 
     private Point3D getPoint(double y, double v) {
-        double x = r * y * y + r / 2;
-        double y1 = r * y;
-        x += (random.nextDouble() / 10 * x * 2) - (random.nextDouble() / 10 * x * 2);
-        y1 += (random.nextDouble() / 10 * y1 * 2) - (random.nextDouble() / 10 * y1 * 2);
-        return new Point3D(x, y1, h * v);
+        double x = y * y + 0.5;
+        x += (random.nextDouble() / DISTORTION_COEF * x * 2) - (random.nextDouble() / DISTORTION_COEF * x * 2);
+        y += (random.nextDouble() / DISTORTION_COEF * y * 2) - (random.nextDouble() / DISTORTION_COEF * y * 2);
+        return new Point3D(x, y, v);
     }
 }

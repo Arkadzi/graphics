@@ -29,8 +29,10 @@ public class WireframeDrawing implements Drawing {
     private boolean reverse;
     private Color lineColor;
     private double factor;
+    private int scale;
 
-    public WireframeDrawing(Graphics graphics, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse, Color lineColor, int lightShiftFi, int lightShiftTheta, double factor) {
+    public WireframeDrawing(Graphics graphics, int scale, PointsGenerator pointsGenerator, int fiAngle, int thetaAngle, boolean showNormal, boolean isContinuous, boolean reverse, Color lineColor, int lightShiftFi, int lightShiftTheta, double factor) {
+        this.scale = scale;
         try {
             image = ImageIO.read(new File("Jupiter.jpg"));
         } catch (IOException e) {
@@ -77,12 +79,12 @@ public class WireframeDrawing implements Drawing {
     }
 
     private void drawFigure(PointsGenerator pointsGenerator, boolean reverse) {
-        Point3D[][] cylinderPoints = pointsGenerator.generatePoints();
+        Point3D[][] cylinderPoints = pointsGenerator.generatePoints(scale);
         Polygon<Point3D>[] convert = Utils.convert(cylinderPoints, reverse, isContinuous);
         Vector v = cameraVector;
 
         Vector l = lightVector.divide(lightVector.length());
-        Point3D orig = new Point3D(-500 * lightVector.x, -500 * lightVector.y, -500 * lightVector.z);
+        Point3D orig = new Point3D(-scale * 10 * lightVector.x, -scale * 10 * lightVector.y, -scale * 10 * lightVector.z);
         Point3D destination = new Point3D(0, 0, 0);
         Vector vector = new Vector(orig, destination);
         vector = vector.divide(vector.length());
@@ -112,24 +114,24 @@ public class WireframeDrawing implements Drawing {
                     drawNormal(polygon);
                 }
             }
-        }
-        for (Intersection intersection : intersections) {
-            Point3D intersectionPoint = intersection.getIntersectionPoint();
-            Point3D origin = intersection.getOrigin();
-            Point2D destinationPoint;
-            if (intersectionPoint != null) {
-                Vector n = Utils.getNormal(intersection.getPolygon());
-                destinationPoint = isometricTransformer.transform(intersectionPoint);
-                Point3D normalTo = destinationPoint(intersectionPoint, n, NORMAL_LENGTH);
-                Point2D normalTo2D = isometricTransformer.transform(normalTo);
-                graphics.line(destinationPoint, normalTo2D, Color.green);
-            } else {
-                Point3D point3D = destinationPoint(origin, intersection.getDirection(), NORMAL_LENGTH * 3);
-                destinationPoint = isometricTransformer.transform(point3D);
+            for (int i = 0; i < intersections.size(); i++) {
+                Intersection intersection = intersections.get(i);
+                Point3D intersectionPoint = intersection.getIntersectionPoint();
+                Point3D origin = intersection.getOrigin();
+                Point2D destinationPoint;
+                if (intersectionPoint != null) {
+                    Vector n = Utils.getNormal(intersection.getPolygon());
+                    destinationPoint = isometricTransformer.transform(intersectionPoint);
+                    Point3D normalTo = destinationPoint(intersectionPoint, n, NORMAL_LENGTH);
+                    Point2D normalTo2D = isometricTransformer.transform(normalTo);
+                    graphics.line(destinationPoint, normalTo2D, Color.green);
+                } else {
+                    Point3D point3D = destinationPoint(origin, intersection.getDirection(), NORMAL_LENGTH * 3);
+                    destinationPoint = isometricTransformer.transform(point3D);
+                }
+                Point2D origin2D = isometricTransformer.transform(origin);
+                graphics.line(origin2D, destinationPoint, i == 0 ? Color.yellow : Color.white);
             }
-            Point2D origin2D = isometricTransformer.transform(origin);
-            graphics.line(origin2D, destinationPoint, Color.white);
-
         }
     }
 
@@ -219,18 +221,28 @@ public class WireframeDrawing implements Drawing {
         do {
             intersection = new Intersection(orig, origDir);
             for (Polygon<Point3D> polygon : polygons) {
+                if (!intersections.isEmpty()) {
+                    Polygon<Point3D> prevPolygon = intersections.get(intersections.size() - 1).getPolygon();
+                    Vector normal = Utils.getNormal(prevPolygon);
+                    Vector normal1 = Utils.getNormal(polygon);
+                    if (polygon.equals(prevPolygon) || normal.angle(normal1) < 0.0001)
+                    continue;
+                }
                 Vector normal = Utils.getNormal(polygon);
-                if (normal.mul(-1).angle(intersection.getDirection()) < 90) {
-                    Point3D intersectionPoint = Utils.intersect(orig, intersection.getDirection(), polygon);
-                    if (intersectionPoint != null) {
-                        intersection.setIntersection(polygon, intersectionPoint);
-                    }
+                Point3D intersectionPoint = Utils.intersect(orig, intersection.getDirection(), polygon);
+                if (intersectionPoint != null) {
+                    intersection.setIntersection(polygon, intersectionPoint);
                 }
             }
             if (intersection.getIntersectionPoint() != null) {
                 Vector normal = Utils.getNormal(intersection.getPolygon());
                 origDir = Utils.getReflectedVector(normal, intersection.getDirection());
                 orig = intersection.getIntersectionPoint();
+                double angle = normal.mul(-1).angle(intersection.getDirection());
+                if (angle > 89.99) {
+                    System.out.println("wrong intersection " + angle);
+                    break;
+                }
             }
             intersections.add(intersection);
         } while (intersection.getIntersectionPoint() != null);

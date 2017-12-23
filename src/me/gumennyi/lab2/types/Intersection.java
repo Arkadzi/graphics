@@ -12,8 +12,10 @@ public class Intersection {
     }
 
     public void setIntersection(Polygon<Point3D> polygon, Point3D intersectionPoint) {
+        double abs = Math.abs(new Vector(origin, intersectionPoint).length());
+        double abs1 = this.intersectionPoint != null ? Math.abs(new Vector(origin, this.intersectionPoint).length()) : 0;
         if (this.intersectionPoint == null ||
-                new Vector(origin, intersectionPoint).length() < new Vector(origin, this.intersectionPoint).length()) {
+                abs < abs1) {
             this.intersectionPoint = intersectionPoint;
             this.polygon = polygon;
         }

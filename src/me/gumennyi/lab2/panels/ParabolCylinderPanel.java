@@ -12,7 +12,7 @@ import java.awt.event.KeyListener;
 import java.util.function.Function;
 
 public class ParabolCylinderPanel implements GraphicPanels {
-    private static final int SIZE = 500;
+    private static final int SIZE = 700;
     private int fiAngle = 220;
     private int thetaAngle = 60;
     private GraphicCanvas canvas;
@@ -24,6 +24,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     private int lightShiftFi = 0;
     private int lightShiftTheta = 0;
     private double factor;
+    private ParabolCylinderPoints pointsGenerator;
 
 
     public ParabolCylinderPanel() {
@@ -36,6 +37,7 @@ public class ParabolCylinderPanel implements GraphicPanels {
     }
 
     private void init() {
+        generatePointsGenerator();
         panel = new JPanel(new BorderLayout());
         panel.add(canvas);
         panel.addKeyListener(new KeyListener() {
@@ -66,23 +68,25 @@ public class ParabolCylinderPanel implements GraphicPanels {
                         repaint();
                         break;
                     case 107:
-                        scale += 10;
+                        scale += 50;
                         repaint();
                         break;
                     case 109:
-                        if (scale > 10) {
-                            scale -= 10;
+                        if (scale > 50) {
+                            scale -= 50;
                             repaint();
                         }
                         break;
                     case 100:
                         if (edges > 2) {
                             edges -= 2;
+                            generatePointsGenerator();
                             repaint();
                         }
                         break;
                     case 102:
                         edges += 2;
+                        generatePointsGenerator();
                         repaint();
                         break;
                     case 78:
@@ -136,9 +140,15 @@ public class ParabolCylinderPanel implements GraphicPanels {
     }
 
     private Function<Graphics, Drawing> newCylinderFunction() {
-        return graphics -> new WireframeDrawing(graphics,
-                                                new ParabolCylinderPoints(scale, scale, edges, edges), fiAngle,
-                                                thetaAngle, showNormals, false, true, lineColor, lightShiftFi, lightShiftTheta, factor);
+        return graphics -> {
+            return new WireframeDrawing(graphics,
+                    scale, pointsGenerator, fiAngle,
+                    thetaAngle, showNormals, false, true, lineColor, lightShiftFi, lightShiftTheta, factor);
+        };
+    }
+
+    private void generatePointsGenerator() {
+        pointsGenerator = new ParabolCylinderPoints(edges);
     }
 
 }

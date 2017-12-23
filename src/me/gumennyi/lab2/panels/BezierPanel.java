@@ -192,7 +192,7 @@ public class BezierPanel implements GraphicPanels {
     private Function<me.gumennyi.lab2.graphics.Graphics, Drawing> newFunction() {
         pointsGenerator = new BezierPoints(sourcePoints, scale, scale, edges, edges);
         return graphics -> {
-            return new WireframeDrawing(graphics,
+            return new WireframeDrawing(graphics, scale,
                     pointsGenerator,
                     fiAngle, thetaAngle, showNormals, true, true, lineColor, lightShiftFi, lightShiftTheta, factor);
         };

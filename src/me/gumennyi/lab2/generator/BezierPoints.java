@@ -30,7 +30,7 @@ public class BezierPoints implements PointsGenerator {
     }
 
     @Override
-    public Point3D[][] generatePoints() {
+    public Point3D[][] generatePoints(int scale) {
         if (point3DS == null) {
             double step = 1. / vParts;
 
